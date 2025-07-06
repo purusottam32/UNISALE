@@ -2,26 +2,43 @@ import React from 'react';
 import Logo from "../assets/Logo.svg"
 import Heart from "../assets/Heart.svg"
 import searchIcon from "../assets/searchIcon.svg"
+import profileMale from "../assets/profileMale.svg"
+import profileFemale from "../assets/profileFemale.svg"
 
 const Navbar = () => {
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white shadow-md py-4 px-6">  
-      <div className="mx-auto flex justify-between items-center">
-        <div className="">
-          <img src={Logo} width="100px" height="100px"alt="logo " />
+    <div className="fixed w-full top-0 left-0 right-0 bg-white shadow-sm py-3 px-6">  
+      <div className="flex items-center justify-between">
+          {/* logo and menu */}
+        <div className='flex items-center justify-between'>
+            <div className="mb-2">
+              <img src={Logo} width="120px" height="100px"alt="logo " />
+            </div>
+            <div className="space-x-6 mt-2.5">
+              <navlink href="#" className=" text-xl text-black hover:text-gray-600">Home</navlink>
+              <navlink href="#" className="text-xl text-black hover:text-gray-600">Sell Item</navlink>
+              <navlink href="#" className="text-xl text-black hover:text-gray-600">My Account</navlink>
+            </div>
         </div>
-        <div className="hidden md:flex space-x-6">
-          <a href="#" className="text-gray-700 hover:text-blue-600">Home</a>
-          <a href="#" className="text-gray-700 hover:text-blue-600">Sell Item</a>
-          <a href="#" className="text-gray-700 hover:text-blue-600">My Account</a>
-        </div>
-        <button className="md:hidden text-gray-700">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      </div>
-    </nav>
+        {/* search + wishlist + profile */}
+            <div className="flex items-center bg-gray-200 pl-3 py-2 rounded-full shadow-sm">
+              <img src={searchIcon} alt="search" className="w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search"
+                className="ml-2 bg-transparent outline-none text-xl placeholder-black"
+              />
+            </div>
+            <div className='bg-gray-200 p-2 items-center justify-between rounded-full'>
+              <img src={Heart} alt="wishllist" width="25px" height="25px"/>
+            </div>
+            <div className='bg-gray-200 p-2 items-center justify-between rounded-full'>
+              <img src={profileMale} alt="wishllist" width="25px" height="25px"/>
+            </div>
+          </div>
+      
+
+    </div>
   );
 };
 
