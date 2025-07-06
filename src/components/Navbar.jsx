@@ -4,6 +4,7 @@ import Heart from "../assets/Heart.svg"
 import searchIcon from "../assets/searchIcon.svg"
 import profileMale from "../assets/profileMale.svg"
 import profileFemale from "../assets/profileFemale.svg"
+import user from "../assets/user.svg"
 
 const Navbar = () => {
   return (
@@ -21,6 +22,7 @@ const Navbar = () => {
             </div>
         </div>
         {/* search + wishlist + profile */}
+        <div className='flex items-center space-x-3 '>
             <div className="flex items-center bg-gray-200 pl-3 py-2 rounded-full shadow-sm">
               <img src={searchIcon} alt="search" className="w-5 h-5" />
               <input
@@ -33,11 +35,10 @@ const Navbar = () => {
               <img src={Heart} alt="wishllist" width="25px" height="25px"/>
             </div>
             <div className='bg-gray-200 p-2 items-center justify-between rounded-full'>
-              <img src={profileMale} alt="wishllist" width="25px" height="25px"/>
+              <img src={user} alt="user" width="25px" height="25px" className=''/>
             </div>
           </div>
-      
-
+        </div>
     </div>
   );
 };
