@@ -1,6 +1,6 @@
 // App.jsx
 import React from 'react';
-import Navbar from "../components/Navbar";
+// import Navbar from "../components/Navbar";
 import SearchBar from '../components/SearchBar';
 // import CategoryFilters from '../components/CategoryFilters';
 import PriceRange from '../components/PriceRange';

@@ -1,6 +1,6 @@
 import React from "react";
 import Homepage from "./Pages/Homepage";
-import Searchpage from "./Pages/Searchpage";
+import SearchPage from "./Pages/SearchPage";
 import SignupForm from "./Pages/SignupForm";
 import LoginForm from "./Pages/LoginForm";
 import Category from "./Pages/Category";
@@ -15,14 +15,14 @@ function App() {
       {/* Layout applied to these routes */}
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Homepage />} />
-        <Route path="search" element={<Searchpage />} />
-        <Route path="search/:query" element={<Searchpage />} />
+        <Route path="search" element={<SearchPage />} />
+        <Route path="search/:query" element={<SearchPage />} />
         <Route path="category" element={<Category />} />
         <Route path="offer-zone" element={<OfferZone />} />
         <Route path="sell-benifits" element={<SellBenifits />} />
-        <Route path="profile" element={<Searchpage />} />
+        <Route path="profile" element={<SearchPage />} />
         <Route path="signup" element={<SignupForm />} />
-      <Route path="login" element={<LoginForm />} />
+      ` <Route path="login" element={<LoginForm />} />
       </Route>
       
     </Routes>
