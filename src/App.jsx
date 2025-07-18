@@ -8,11 +8,14 @@ import OfferZone from "./Pages/OfferZone";
 import MainLayout from "./layout/MainLayout";
 import { Routes, Route } from "react-router-dom";
 import SellBenifits from "./Pages/SellBenifits";
+import { Provider } from "react-redux";
+
 
 function App() {
   return (
-    <Routes>
-      {/* Layout applied to these routes */}
+
+      <Routes>
+        {/* Layout applied to these routes */}
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Homepage />} />
         <Route path="search" element={<SearchPage />} />
@@ -26,6 +29,7 @@ function App() {
       </Route>
       
     </Routes>
+  
   );
 }
 
