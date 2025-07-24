@@ -24,7 +24,7 @@ function App() {
         <Route path="sell-benifits" element={<SellBenifits />} />
         <Route path="profile" element={<Profile />} />
         <Route path="signup" element={<SignupForm />} />
-        <Route path="login" element={<LoginForm />} />
+        <Route path="login" element={<LoginForm />} />  
       </Route>   
     </Routes>
   
