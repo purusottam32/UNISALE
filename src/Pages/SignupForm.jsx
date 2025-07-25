@@ -2,6 +2,9 @@
 import React, { useState } from "react";
 import InputBox from "../components/InputBox";
 import SelectBox from "../components/SelectBox";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import authService from "../appwrite/auth";
 import AuthButton from "../components/AuthButton";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -14,15 +17,31 @@ const collegeOptions = [
 ];
 
 const SignupForm = () => {
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const dispatch = useDispatch();
+
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
+  const onSubmit = async(data) => {
     console.log("Signup Data:", data);
-    // add react-query mutation or Appwrite logic here
+     setError("");
+     try{
+      const userData=await authService.createAccount(data);
+      if(userData){
+        const userData = await authService.getCurrentUser();
+        if(userData) dispatch(login(userData));
+        navigate("/");
+      }
+     }catch(error){
+       setError(error.message);
+     }
+    
   };
 
  
