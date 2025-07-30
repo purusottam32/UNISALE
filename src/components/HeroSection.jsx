@@ -5,7 +5,7 @@ function HeroSection() {
     <div className="w-full">
       <div className="p-2 sm:p-4">
         <div
-          className="flex min-h-[480px] flex-col gap-6 sm:gap-8 rounded-none sm:rounded-xl items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
+          className="flex min-h-[480px] flex-col gap-6 sm:gap-8 rounded-xl sm:rounded-xl items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage:
               'url("https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1350&q=80")',

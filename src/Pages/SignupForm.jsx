@@ -8,7 +8,7 @@ import authService from "../appwrite/auth";
 import AuthButton from "../components/AuthButton";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-
+import { setUser } from "../redux/authSlice";
 
 const collegeOptions = [
   { value: "SOA", label: "SOA University" },
@@ -28,23 +28,28 @@ const SignupForm = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = async(data) => {
+  const onSubmit = async (data) => {
     console.log("Signup Data:", data);
-     setError("");
-     try{
-      const userData=await authService.createAccount(data);
-      if(userData){
-        const userData = await authService.getCurrentUser();
-        if(userData) dispatch(login(userData));
-        navigate("/");
+    setError("");
+  
+    try {
+      const account = await authService.createAccount(data); 
+      if (account) {
+        const currentUser = await authService.getCurrentUser(); 
+        if (currentUser) {
+          dispatch(setUser(currentUser));
+          console.log("navigating to home");
+          navigate("/"); 
+        }
       }
-     }catch(error){
-       setError(error.message);
-     }
-    
+    } catch (error) {
+      console.log("Signup error:", error);
+      setError(error.message);
+    }
   };
 
- 
+
+
 
   return (
     <div className="flex flex-col w-full max-w-[512px] py-5 mx-auto">
