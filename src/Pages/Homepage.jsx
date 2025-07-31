@@ -6,11 +6,11 @@ import FeatureItems from "../components/FeatureItems";
 
 function Homepage() {
   return (
-<>
-            <HeroSection />
-            <PopularCategories />
-            <FeatureItems />
-</>
+  <>
+              <HeroSection />
+              <PopularCategories />
+              <FeatureItems />
+  </>
   )
 }
 

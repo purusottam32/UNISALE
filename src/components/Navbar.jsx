@@ -104,7 +104,7 @@ function Navbar() {
             </div>
          {/* Mobile menu */}
             {menuOpen && (
-              <div className="flex flex-col md:hidden mt-3 px-4 space-y-4">
+              <div className=" md:hidden mt-3 px-4 space-y-4">
                 <NavLink className="block text-[#131712] text-sm font-medium" to="/" onClick={() => setMenuOpen(false)}>Home</NavLink>
                 <NavLink className="block text-[#131712] text-sm font-medium" to="/Category" onClick={() => setMenuOpen(false)}>Categories</NavLink>
                 <NavLink className="block text-[#131712] text-sm font-medium" to="/offer-zone" onClick={() => setMenuOpen(false)}>Offer Zone</NavLink>

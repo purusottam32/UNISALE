@@ -52,8 +52,7 @@ const LoginForm = () => {
       <p className="text-[#6f816a] text-sm text-center pb-1 pt-2">Or continue with</p>
 
       <div className="flex justify-center gap-3 px-4">
-        <AuthButton label="Continue with Email" onClick={() => {}} variant="ghost" />
-        <AuthButton label="Continue with Social" onClick={() => {}} variant="ghost" />
+        <AuthButton label="Continue with Gmail" onClick={() => {}} variant="ghost" />
       </div>
 
       <div className="px-4 py-3">
