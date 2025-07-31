@@ -1,12 +1,55 @@
-# React + Vite
+# 🛍️ UNiSALE - Buy & Sell on Campus
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+UNiSALE is a campus-based marketplace web app where students can **buy and sell** items like books, gadgets, and more — all in one place. It aims to make college trading easy, safe, and fast.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## Expanding the ESLint configuration
+- 🧑‍🎓 **Student Marketplace:** Post and browse products within your college community.
+- 🔍 **Live Search:** Real-time search for listings by product name or category.
+- ❤️ **Wishlist:** Save your favorite items to check later.
+- 🔐 **Authentication:** Secure login/signup using Appwrite.
+- 📦 **Offer Zone:** Special deals and quick sells.
+- 📱 **Fully Responsive:** Works smoothly on both mobile and desktop.
+- 🧭 **Category Browsing:** Filter products easily.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🛠 Tech Stack
+
+| Tech        | Usage                     |
+|-------------|----------------------------|
+| **React.js** | Frontend UI               |
+| **Tailwind CSS** | Fast, responsive styling  |
+| **Firebase** (v1) | Hosting + Realtime DB   |
+| **Appwrite** | Authentication backend    |
+| **React Router** | Page navigation        |
+| *(Future)*  | MongoDB + Express + Node.js |
+
+---
+
+## 🧠 Planned Features
+
+- 💬 Chat between buyer & seller
+
+- 📍 Geo-filtered listings
+
+- 🔄 Product exchange feature
+
+- 📊 Admin dashboard
+
+- 📲 Mobile app version
+
+
+## 🤝 Contributing
+  
+Want to help improve UniSale? Pull requests and suggestions are welcome!
+
+1. Fork the repo
+
+2. Create a branch: git checkout -b feature-name
+
+3. Commit changes: git commit -m "Added something"
+
+4. Push and submit a PR
