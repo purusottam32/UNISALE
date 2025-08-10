@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { FaRegHeart } from "react-icons/fa";
+import { FaUserCircle } from "react-icons/fa";
 import Logo from '../assets/Logo.svg';
+import { useSelector, useDispatch } from "react-redux";
+import { clearUser } from '../redux/authSlice';
+import authService from '../appwrite/auth';
+
+
 
 function Navbar() {
   const [searchInput, setSearchInput] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,6 +24,16 @@ function Navbar() {
       setMenuOpen(false); // close menu after search
     }
   };
+
+  const handleLogout = async () => {
+    try {
+      await authService.logOut(); // Appwrite logout method
+      dispatch(clearUser()); // Clear Redux store
+      navigate("/"); // Redirect to home
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };  
 
   return (
     <header className="border-b border-b-[#f1f4f1] px-4 sm:px-10 py-3 w-full">
@@ -59,13 +77,23 @@ function Navbar() {
 <FaRegHeart />
           </button>
 
+          
+
           {/* Buttons */}
           <button className="rounded-full h-10 px-6 bg-[#f1f4f1] text-sm font-bold">
             <NavLink to="/sell-benifits" className="text-[#131712]">Sell</NavLink>
           </button>
-          <button className="rounded-full h-10 px-5 bg-[#50d22c] text-sm font-bold">
-            <NavLink to="/login" className="text-[#131712]">Login</NavLink>
-          </button>
+          {user ? (
+              <div className="flex items-center gap-4">
+                  <NavLink to="/profile">
+                    <FaUserCircle />
+                  </NavLink>
+               </div>
+            ) : (
+                <button className="rounded-full h-10 px-5 bg-[#50d22c] text-sm font-bold">
+                    <NavLink to="/login" className="text-[#131712]">Login</NavLink>
+                </button>
+            )}
         </div>
 
         {/* Right mobile icons */}

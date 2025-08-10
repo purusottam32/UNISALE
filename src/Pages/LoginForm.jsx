@@ -2,7 +2,11 @@
 import React, { useState } from "react";
 import InputBox from "../components/InputBox";
 import AuthButton from "../components/AuthButton";
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link,useNavigate } from "react-router-dom";
+import authService from "../appwrite/auth";
+import { setUser } from "../redux/authSlice";
+import Homepage from "../Pages/Homepage";
 
 const LoginForm = () => {
   const [form, setForm] = useState({
@@ -10,14 +14,46 @@ const LoginForm = () => {
     password: "",
   });
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [error, setError] = useState("");
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
     console.log("Login Data:", form);
-    // react-query mutation or redux dispatch can go here
+
+        // Basic validation
+    if (!form.email || !form.password) {
+      setError("Please fill in both fields.");
+      return;
+    }
+    if (form.password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+
+     try {
+      await authService.logOut(); // ✅ Ensure old session is cleared
+      const account =await authService.login(form); // ✅ Call login from AuthService
+      if (account) {
+        const currentUser = await authService.getCurrentUser(); 
+        if (currentUser) {
+          dispatch(setUser(currentUser));
+          console.log("navigating to home");
+          navigate("/"); 
+        } 
+      }
+    } catch (err) {
+      setError(err.message || "Login failed. Please check your credentials.");
+    } 
+
+
+    // react-query mutation or redux d ispatch can go here
   };
 
   return (
