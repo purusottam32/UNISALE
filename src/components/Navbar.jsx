@@ -6,7 +6,7 @@ import Logo from '../assets/Logo.svg';
 import { useSelector, useDispatch } from "react-redux";
 import { clearUser } from '../redux/authSlice';
 import authService from '../appwrite/auth';
-
+import Profile from '../Pages/Profile';
 
 
 function Navbar() {
@@ -83,7 +83,7 @@ function Navbar() {
           </button>
           {user ? (
               <div className="flex items-center gap-4">
-                  <NavLink to="/profile">
+                  <NavLink to="/Profile">
                     <img src={avatar} alt="" className='w-8 h-8 rounded-full border-3 border-gray-300' />
                   </NavLink>
                </div>
@@ -97,9 +97,11 @@ function Navbar() {
         {/* Right mobile icons */}
         <div className="sm:hidden flex items-center gap-3">
           {/* Wishlist for mobile */}
-          <button className="rounded-full h-10 w-10 bg-[#f1f4f1] flex items-center justify-center">
-            <img src={avatar} alt="" />
-          </button>
+          <NavLink to="/profile">
+            <button className="rounded-full h-10 w-10 bg-[#f1f4f1] flex items-center justify-center">
+               <img src={avatar} alt="" />
+            </button>
+          </NavLink>
 
           {/* Hamburger icon with correct color */}
           <button onClick={() => setMenuOpen(!menuOpen)} className="text-[#131712]">
