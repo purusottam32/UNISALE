@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import authService from "../appwrite/auth";
 import InputBox from "../components/InputBox";
 import SelectBox from "../components/SelectBox";
+import AuthButton from "../components/AuthButton";
 
 function Profile() {
   const user = useSelector((state) => state.auth.user);
@@ -12,9 +13,11 @@ function Profile() {
   const navigate = useNavigate();
 
   const [name, setName] = useState(user?.name || "");
-  const [email, setEmail] = useState(user?.email || "");
+  const [email] = useState(user?.email || ""); // fixed (email not editable)
   const [phone, setPhone] = useState(user?.phone || "");
   const [gender, setGender] = useState(user?.gender || "");
+  const [password, setPassword] = useState(""); // for password change
+  const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
     await authService.logOut();
@@ -22,17 +25,37 @@ function Profile() {
     navigate("/login");
   };
 
-  const handleSave = () => {
-    dispatch(setUser({ ...user, name, email, phone, gender }));
-    // Later: Add Appwrite update API call here to save permanently
+const handleSave = async () => {
+  try {
+    const updatedUser = await authService.updateProfile({ name, gender });
+    dispatch(setUser(updatedUser)); // keeps Redux in sync so Navbar avatar updates instantly
+    alert("Profile updated successfully!");
+  } catch (err) {
+    alert(err?.message || "Failed to update profile");
+  }
+};
+
+
+  const handlePasswordChange = async () => {
+    if (!password) return alert("Enter new password");
+    try {
+      setLoading(true);
+      await authService.updatePassword(password);
+      setPassword("");
+      alert("Password updated successfully!");
+    } catch (error) {
+      alert(error.message || "Failed to change password");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const avatar =
     gender === "male"
-      ? "https://cdn-icons-png.flaticon.com/512/1999/1999625.png" // young boy
+      ? "https://cdn-icons-png.flaticon.com/512/1999/1999625.png"
       : gender === "female"
-      ? "https://cdn-icons-png.flaticon.com/512/6997/6997662.png" // young girl
-      : "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"; // default neutral
+      ? "https://cdn-icons-png.flaticon.com/512/6997/6997662.png"
+      : "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
 
   if (!user) {
     return (
@@ -61,62 +84,52 @@ function Profile() {
 
       {/* Editable Info */}
       <div className="mt-6 space-y-5">
-        {/* Name */}
+        <InputBox label="Username" value={name} onChange={(e) => setName(e.target.value)} />
+        <InputBox label="Email" type="email" value={email} disabled />
         <InputBox
-          label="Username"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          label="Phone Number"
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="Enter phone number"
         />
-
-        {/* Email */}
-        <InputBox
-          label="Email"
-          type="email"
-          value={email}
-          disabled
-          onChange={(e) => setEmail(e.target.value)}
-        />
-            
-          
-      
-
-        {/* Phone */}
-       <InputBox
-         label="Phone Number"
-         type="tel"
-         value={phone}
-         onChange={(e) => setPhone(e.target.value)}
-         placeholder="Enter phone number"
-       />
-
-        {/* Gender */}
         <SelectBox
           label="Gender"
           value={gender}
           options={[
-            { value: "", label: "Select Gender" },
             { value: "male", label: "Male" },
             { value: "female", label: "Female" },
           ]}
           onChange={(e) => setGender(e.target.value)}
-        >
-          
-        </SelectBox>
+        />
       </div>
-      {/* Save + Logout Buttons */}
+
+      {/* Save + Logout */}
       <div className="mt-8 flex flex-col sm:flex-row gap-3">
-        <button
+        <AuthButton
+          label={loading ? "Saving..." : "Save Changes"}
           onClick={handleSave}
-          className="flex-1 py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition"
-        >
-          Save Changes
-        </button>
-        <button
-          onClick={handleLogout}
-          className="flex-1 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition"
-        >
-          Logout
-        </button>
+          variant="primary"
+          disabled={loading}
+        />
+        <AuthButton label="Logout" onClick={handleLogout} variant="ghost" />
+      </div>
+
+      {/* Password Change */}
+      <div className="mt-8 space-y-3">
+        <InputBox
+          label="New Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter new password"
+        />
+        <AuthButton
+          label={loading ? "Updating..." : "Change Password"}
+          onClick={handlePasswordChange}
+          variant="secondary"
+          disabled={loading}
+        />
       </div>
     </div>
   );

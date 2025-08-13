@@ -21,7 +21,7 @@ const SelectBox = ({ label, name, value, onChange, options = [] , ...rest}) => {
         ))}
       </select>
     </div>
-  );
+  );  
 };
 
 export default SelectBox;

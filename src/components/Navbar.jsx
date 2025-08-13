@@ -15,6 +15,13 @@ function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
+  const avatar =
+    user?.gender === "male"
+      ? "https://cdn-icons-png.flaticon.com/512/1999/1999625.png" // young boy
+      : user?.gender === "female"
+      ? "https://cdn-icons-png.flaticon.com/512/6997/6997662.png" // young girl
+      : "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"; // default neutral
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -25,15 +32,6 @@ function Navbar() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await authService.logOut(); // Appwrite logout method
-      dispatch(clearUser()); // Clear Redux store
-      navigate("/"); // Redirect to home
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };  
 
   return (
     <header className="border-b border-b-[#f1f4f1] px-4 sm:px-10 py-3 w-full">
@@ -86,7 +84,7 @@ function Navbar() {
           {user ? (
               <div className="flex items-center gap-4">
                   <NavLink to="/profile">
-                    <FaUserCircle />
+                    <img src={avatar} alt="" className='w-8 h-8 rounded-full border-3 border-gray-300' />
                   </NavLink>
                </div>
             ) : (
@@ -100,7 +98,7 @@ function Navbar() {
         <div className="sm:hidden flex items-center gap-3">
           {/* Wishlist for mobile */}
           <button className="rounded-full h-10 w-10 bg-[#f1f4f1] flex items-center justify-center">
-            <FaRegHeart />
+            <img src={avatar} alt="" />
           </button>
 
           {/* Hamburger icon with correct color */}
