@@ -9,8 +9,30 @@ import MainLayout from "./layout/MainLayout";
 import { Routes, Route } from "react-router-dom";
 import SellBenifits from "./Pages/SellBenifits";
 import Profile from "./Pages/Profile";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import {setUser,clearUser} from "./redux/authSlice";
+import authService from "./appwrite/auth";
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+          const user = await authService.getCurrentUser();
+          if (user) {
+            dispatch(setUser(user));
+          } else {
+            dispatch(clearUser());
+          }
+        } catch {
+          dispatch(clearUser());
+        }
+      };
+
+      loadUser();
+    }, [dispatch]);
   return (
 
     <Routes>
