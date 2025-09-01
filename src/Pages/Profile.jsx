@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { clearUser, setUser } from "../redux/authSlice";
 import { useNavigate } from "react-router-dom";
@@ -6,18 +6,29 @@ import authService from "../appwrite/auth";
 import InputBox from "../components/InputBox";
 import SelectBox from "../components/SelectBox";
 import AuthButton from "../components/AuthButton";
+import { use } from "react";
 
 function Profile() {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+const [name, setName] = useState("");
+const [email, setEmail] = useState("");
+const [phone, setPhone] = useState("");
+const [gender, setGender] = useState("");
+const [newPassword, setNewPassword] = useState("");
+const [currentPassword, setCurrentPassword] = useState("");
+const [loading, setLoading] = useState(false);
 
-  const [name, setName] = useState(user?.name || "");
-  const [email] = useState(user?.email || ""); // fixed (email not editable)
-  const [phone, setPhone] = useState(user?.phone || "");
-  const [gender, setGender] = useState(user?.gender || "");
-  const [password, setPassword] = useState(""); // for password change
-  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+        setName(user.name || user.profile?.name || "");
+        setEmail(user.email || user.profile?.email || "");
+        setPhone(user.profile?.phone || "");
+        setGender(user.profile?.gender || "");
+    }
+  }, [user]);
 
   const handleLogout = async () => {
     await authService.logOut();
@@ -27,28 +38,31 @@ function Profile() {
 
 const handleSave = async () => {
   try {
-    const updatedUser = await authService.updateProfile({ name, gender });
-    dispatch(setUser(updatedUser)); // keeps Redux in sync so Navbar avatar updates instantly
-    alert("Profile updated successfully!");
-  } catch (err) {
-    alert(err?.message || "Failed to update profile");
+    setLoading(true);
+    const updated = await authService.updateProfile({ name, phone, gender });
+    dispatch(setUser(updated));
+    alert("Profile updated!");
+  } catch (e) {
+    alert(e?.message || "Failed to update profile");
+  } finally {
+    setLoading(false);
   }
 };
 
 
   const handlePasswordChange = async () => {
-    if (!password) return alert("Enter new password");
-    try {
-      setLoading(true);
-      await authService.updatePassword(password);
-      setPassword("");
-      alert("Password updated successfully!");
-    } catch (error) {
-      alert(error.message || "Failed to change password");
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!newPassword || !currentPassword) return alert("Enter both current and new password");
+  try {
+    setLoading(true);
+    await authService.updatePassword(newPassword, currentPassword);
+    setNewPassword(""); setCurrentPassword("");
+    alert("Password changed");
+  } catch (e) {
+    alert(e?.message || "Failed to change password");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const avatar =
     gender === "male"

@@ -15,10 +15,12 @@ function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
+  const gender = user?.profile?.gender || user?.gender || "";
+
   const avatar =
-    user?.gender === "male"
+    gender === "male"
       ? "https://cdn-icons-png.flaticon.com/512/1999/1999625.png" // young boy
-      : user?.gender === "female"
+      : gender === "female"
       ? "https://cdn-icons-png.flaticon.com/512/6997/6997662.png" // young girl
       : "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"; // default neutral
 
