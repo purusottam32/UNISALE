@@ -76,7 +76,13 @@ export class AuthService {
     // ------------------ LOGOUT ------------------
     async logout() {
         try {
-            return await account.deleteSessions();
+            // get current session list
+            const sessions = await this.account.listSessions();
+
+            if (sessions.total > 0) {
+                // delete only if a session exists
+                await this.account.deleteSession("current");
+            }
         } catch (error) {
             console.error("Logout error:", error);
             throw error;
