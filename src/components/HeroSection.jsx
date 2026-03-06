@@ -1,6 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function HeroSection() {
+  const navigate = useNavigate();
+
   return (
     <div className="w-full">
       <div className="p-2 sm:p-4">
@@ -19,7 +22,11 @@ function HeroSection() {
               Buy and sell items with fellow students. Find textbooks, electronics, furniture, and more.
             </h2>
           </div>
-          <button className="h-10 sm:h-12 px-4 rounded-full bg-[#50d22c] text-[#131712] text-sm sm:text-base font-bold">
+          <button
+            type="button"
+            onClick={() => navigate("/results")}
+            className="h-10 sm:h-12 px-4 rounded-full bg-[#50d22c] text-[#131712] text-sm sm:text-base font-bold"
+          >
             <span className="truncate">Explore Items</span>
           </button>
         </div>

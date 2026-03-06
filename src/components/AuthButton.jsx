@@ -1,7 +1,13 @@
-// src/components/Auth/AuthButton.jsx
 import React from "react";
 
-const AuthButton = ({ label, onClick, variant = "primary" }) => {
+const AuthButton = ({
+  label,
+  onClick,
+  variant = "primary",
+  type = "button",
+  disabled = false,
+  className = "",
+}) => {
   const styles = {
     primary: "bg-[#50d22c] text-[#131712]",
     secondary: "bg-[#8cd279] text-[#131612]",
@@ -10,8 +16,10 @@ const AuthButton = ({ label, onClick, variant = "primary" }) => {
 
   return (
     <button
+      type={type}
       onClick={onClick}
-      className={`rounded-full h-10 px-4 w-full font-bold ${styles[variant]}`}
+      disabled={disabled}
+      className={`rounded-full h-10 px-4 w-full font-bold disabled:opacity-60 disabled:cursor-not-allowed ${styles[variant]} ${className}`}
     >
       {label}
     </button>

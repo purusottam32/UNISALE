@@ -1,69 +1,105 @@
-import React from 'react';
-import { FaRegHeart, FaStar } from 'react-icons/fa';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
+import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
+import { getErrorMessage } from "../utils/getErrorMessage";
 
-export default function ProductCard({ product }) {
-  const imageUrl = product.images && product.images[0] ? product.images[0] : '/fallback.svg';
+const getRelativeTime = (isoDate) => {
+  if (!isoDate) {
+    return "Recently";
+  }
+
+  const timestamp = new Date(isoDate).getTime();
+  const diffMs = Date.now() - timestamp;
+
+  const minute = 60 * 1000;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+
+  if (diffMs < hour) {
+    return `${Math.max(Math.floor(diffMs / minute), 1)}m ago`;
+  }
+
+  if (diffMs < day) {
+    return `${Math.max(Math.floor(diffMs / hour), 1)}h ago`;
+  }
+
+  return `${Math.max(Math.floor(diffMs / day), 1)}d ago`;
+};
+
+const ProductCard = ({
+  product,
+  isWishlisted = false,
+  onToggleWishlist,
+  isWishlistLoading = false,
+}) => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const productId = product?._id || product?.id;
+  const imageUrl = product?.images?.[0]?.url || product?.images?.[0] || "/fallback.svg";
+  const sellerName = product?.seller?.name || "Unknown Seller";
+
+  const handleWishlistClick = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!onToggleWishlist || !productId) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      toast.error("Please login to use wishlist.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      await onToggleWishlist(productId);
+      toast.success(isWishlisted ? "Removed from wishlist." : "Added to wishlist.");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to update wishlist."));
+    }
+  };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-      {/* Image */}
+    <Link
+      to={`/products/${productId}`}
+      className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-[#eef2ee]"
+    >
       <div className="relative w-full aspect-square bg-gray-100 overflow-hidden rounded-lg">
         <img
           src={imageUrl}
-          alt={product.title}
+          alt={product?.title}
           loading="lazy"
-        //   onError={(e) => { e.currentTarget.src = '/fallback.svg'; }}
+          onError={(event) => {
+            event.currentTarget.src = "/fallback.svg";
+          }}
           className="w-full h-full object-cover hover:scale-105 transition-transform"
         />
-        <button className="absolute top-2 right-2 p-2 bg-white rounded-full shadow hover:bg-gray-100">
-          <FaRegHeart className="text-red-500" />
+        <button
+          type="button"
+          disabled={isWishlistLoading}
+          className="absolute top-2 right-2 p-2 bg-white rounded-full shadow hover:bg-gray-100 disabled:opacity-60"
+          onClick={handleWishlistClick}
+        >
+          {isWishlisted ? <FaHeart className="text-red-500" /> : <FaRegHeart className="text-red-500" />}
         </button>
       </div>
 
-      {/* Content */}
       <div className="p-3">
-        {/* Title */}
-        <h3 className="text-[#131712] font-medium text-sm line-clamp-2 mb-1">
-          {product.title}
-        </h3>
+        <h3 className="text-[#131712] font-medium text-sm line-clamp-2 mb-1">{product?.title}</h3>
+        <p className="text-[#6d8566] text-xs line-clamp-1 mb-2">{product?.category}</p>
+        <p className="text-[#131712] font-bold text-lg mb-2">Rs. {Number(product?.price || 0).toLocaleString()}</p>
 
-        {/* Brief */}
-        <p className="text-[#6d8566] text-xs line-clamp-1 mb-2">
-          {product.brief}
-        </p>
-
-        {/* Condition & Used Duration */}
-        <div className="flex gap-2 text-xs mb-2">
-          <span className="bg-[#f1f4f1] text-[#6d8566] px-2 py-1 rounded">
-            {product.condition}
-          </span>
-          <span className="text-[#6d8566]">
-            {product.usedDuration}
-          </span>
+        <div className="text-xs">
+          <p className="text-[#131712] font-medium">{sellerName}</p>
+          <p className="text-[#6d8566]">Posted {getRelativeTime(product?.createdAt)}</p>
         </div>
-
-        {/* Price */}
-        <p className="text-[#131712] font-bold text-lg mb-2">
-          ₹ {product.price.toLocaleString()}
-        </p>
-
-        {/* Seller Info */}
-        <div className="flex items-center justify-between text-xs">
-          <div>
-            <p className="text-[#131712] font-medium">{product.seller.name}</p>
-            <p className="text-[#6d8566]">{product.seller.campus}</p>
-          </div>
-          <div className="flex items-center gap-1">
-            <FaStar className="text-yellow-500" size={12} />
-            <span className="text-[#6d8566] font-medium">{product.seller.rating}</span>
-          </div>
-        </div>
-
-        {/* Posted date */}
-        <p className="text-[#6d8566] text-xs mt-2">
-          Posted {product.postedAt}
-        </p>
       </div>
-    </div>
+    </Link>
   );
-}
+};
+
+export default ProductCard;

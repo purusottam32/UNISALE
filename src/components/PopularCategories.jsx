@@ -12,17 +12,13 @@ const categories = [
 function PopularCategories() {
   const navigate = useNavigate();
 
-  const handleCategoryClick = (categoryName) => {
-    console.log('Category clicked:', categoryName);
-    navigate(`/results?cat=${encodeURIComponent(categoryName.toLowerCase())}`);
-  };
+  const handleCategorySubmit = (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const category = form.elements?.cat?.value || "";
 
-  const handleCategorySubmit = (e) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const cat = form.elements?.cat?.value || "";
-    if (cat) {
-      navigate(`/results?cat=${encodeURIComponent(cat.toLowerCase())}`);
+    if (category) {
+      navigate(`/results?cat=${encodeURIComponent(category)}`);
     }
   };
 
@@ -30,18 +26,23 @@ function PopularCategories() {
     <>
       <h2 className="text-[#131712] text-[22px] font-bold px-4 pb-3 pt-5">Popular Categories</h2>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
-        {categories.map((cat) => (
-          <form key={cat.name} onSubmit={handleCategorySubmit} className="flex flex-col gap-3 pb-3">
-            <input type="hidden" name="cat" value={cat.name} />
-            <button type="submit" className="p-0 border-0 bg-transparent text-left cursor-pointer hover:opacity-80 transition-opacity">
+        {categories.map((category) => (
+          <form key={category.name} onSubmit={handleCategorySubmit} className="flex flex-col gap-3 pb-3">
+            <input type="hidden" name="cat" value={category.name} />
+            <button
+              type="submit"
+              className="p-0 border-0 bg-transparent text-left cursor-pointer hover:opacity-80 transition-opacity"
+            >
               <img
-                src={cat.url}
-                alt={cat.name}
+                src={category.url}
+                alt={category.name}
                 loading="lazy"
-                onError={(e) => { e.currentTarget.src = '/fallback.svg'; }}
+                onError={(event) => {
+                  event.currentTarget.src = "/fallback.svg";
+                }}
                 className="w-full aspect-square object-cover rounded-xl"
               />
-              <p className="text-[#131712] text-base font-medium mt-2">{cat.name}</p>
+              <p className="text-[#131712] text-base font-medium mt-2">{category.name}</p>
             </button>
           </form>
         ))}
