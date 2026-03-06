@@ -2,9 +2,7 @@
 import React, { useState } from "react";
 import InputBox from "../components/InputBox";
 import SelectBox from "../components/SelectBox";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import authService from "../appwrite/auth";
 import AuthButton from "../components/AuthButton";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -19,7 +17,7 @@ const collegeOptions = [
 const SignupForm = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
-  const dispatch = useDispatch();
+  // no auth backend: local navigation only
 
 
   const {
@@ -33,15 +31,9 @@ const SignupForm = () => {
     setError("");
   
     try {
-      const account = await authService.createAccount(data); 
-      if (account) {
-        const currentUser = await authService.getCurrentUser(); 
-        if (currentUser) {
-          dispatch(setUser(currentUser));
-          console.log("navigating to home");
-          navigate("/"); 
-        }
-      }
+      // Backend removed: just log and navigate to login for now
+      console.log("Signup data (no backend):", data);
+      navigate("/login");
     } catch (error) {
       console.log("Signup error:", error);
       setError(error.message);

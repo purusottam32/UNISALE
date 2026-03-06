@@ -66,10 +66,13 @@ function FeaturedItems() {
               key={index}
               className="w-[160px] sm:w-[180px] flex flex-col gap-3 rounded-lg"
             >
-              <div
-                className="w-full aspect-square bg-center bg-no-repeat bg-cover rounded-xl"
-                style={{ backgroundImage: `url(${item.url})` }}
-              ></div>
+                <img
+                  src={item.url}
+                  alt={item.name}
+                  loading="lazy"
+                  onError={(e) => { e.currentTarget.src = '/fallback.svg'; }}
+                  className="w-full aspect-square bg-center bg-no-repeat object-cover rounded-xl"
+                />
               <div>
                 <p className="text-[#131712] text-sm font-medium truncate">
                   {item.name}

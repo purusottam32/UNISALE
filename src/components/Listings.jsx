@@ -31,12 +31,15 @@ const items = [
 export default function Listings() {
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
-      {items.map((item, i) => (
+        {items.map((item, i) => (
         <div key={i} className="flex flex-col gap-3 pb-3">
-          <div
-            className="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg"
-            style={{ backgroundImage: `url(${item.image})` }}
-          ></div>
+          <img
+            src={item.image}
+            alt={item.title}
+            loading="lazy"
+            onError={(e) => { e.currentTarget.src = '/fallback.svg'; }}
+            className="w-full bg-center bg-no-repeat aspect-square object-cover rounded-lg"
+          />
           <div>
             <p className="text-[#131712] text-base font-medium leading-normal">{item.title}</p>
             <p className="text-[#6d8566] text-sm font-normal leading-normal">{item.price}</p>

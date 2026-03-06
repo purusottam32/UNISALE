@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+
 
 export default function SearchBar({ placeholder = 'Search' }) {
 const { query } = useParams();
   const [searchInput, setSearchInput] = useState("");
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (query) {
       setSearchInput(decodeURIComponent(query));
@@ -14,7 +15,10 @@ const { query } = useParams();
 
   const handleSearchFromHere = (e) => {
     e.preventDefault();
-    // Optional: navigate to /search again with new text
+    // Navigate to search page with query
+    if (searchInput.trim()) {
+        navigate(`/results?cat=${searchInput.trim()}`);
+    }
   };
 
 

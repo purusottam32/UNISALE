@@ -2,7 +2,6 @@ import React, { useState ,useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { clearUser, setUser } from "../redux/authSlice";
 import { useNavigate } from "react-router-dom";
-import authService from "../appwrite/auth";
 import InputBox from "../components/InputBox";
 import SelectBox from "../components/SelectBox";
 import AuthButton from "../components/AuthButton";
@@ -31,38 +30,40 @@ const [loading, setLoading] = useState(false);
   }, [user]);
 
   const handleLogout = async () => {
-    await authService.logOut();
+    // Backend removed: just clear local user and navigate to login
     dispatch(clearUser());
     navigate("/login");
   };
 
-const handleSave = async () => {
-  try {
+  const handleSave = async () => {
+    // Local-only update: update redux state with new values
     setLoading(true);
-    const updated = await authService.updateProfile({ name, phone, gender });
-    dispatch(setUser(updated));
-    alert("Profile updated!");
-  } catch (e) {
-    alert(e?.message || "Failed to update profile");
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      const updatedUser = {
+        ...user,
+        name,
+        profile: {
+          ...(user?.profile || {}),
+          name,
+          phone,
+          gender,
+        },
+      };
+      dispatch(setUser(updatedUser));
+      alert("Profile updated (local)");
+    } catch (e) {
+      alert(e?.message || "Failed to update profile");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   const handlePasswordChange = async () => {
-  if (!newPassword || !currentPassword) return alert("Enter both current and new password");
-  try {
-    setLoading(true);
-    await authService.updatePassword(newPassword, currentPassword);
-    setNewPassword(""); setCurrentPassword("");
-    alert("Password changed");
-  } catch (e) {
-    alert(e?.message || "Failed to change password");
-  } finally {
-    setLoading(false);
-  }
-};
+    // No backend: notify user that password change isn't implemented
+    if (!newPassword || !currentPassword) return alert("Enter both current and new password");
+    alert("Password change is not available (backend removed).");
+  };
 
   const avatar =
     gender === "male"

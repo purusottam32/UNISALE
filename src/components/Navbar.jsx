@@ -5,8 +5,6 @@ import { FaUserCircle } from "react-icons/fa";
 import Logo from '../assets/Logo.svg';
 import { useSelector, useDispatch } from "react-redux";
 import { clearUser } from '../redux/authSlice';
-import authService from '../appwrite/auth';
-import Profile from '../Pages/Profile';
 
 
 function Navbar() {
@@ -28,7 +26,8 @@ function Navbar() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (searchInput.trim()) {
-      navigate(`/search/${encodeURIComponent(searchInput.trim())}`);
+          navigate(`/results?cat=${searchInput.trim()}`);
+      
       setSearchInput('');
       setMenuOpen(false); // close menu after search
     }

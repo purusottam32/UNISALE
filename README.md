@@ -9,7 +9,7 @@ UNiSALE is a campus-based marketplace web app where students can **buy and sell*
 - 🧑‍🎓 **Student Marketplace:** Post and browse products within your college community.
 - 🔍 **Live Search:** Real-time search for listings by product name or category.
 - ❤️ **Wishlist:** Save your favorite items to check later.
-- 🔐 **Authentication:** Secure login/signup using Appwrite.
+- 🔐 **Authentication:** Secure login/signup (backend removed — local stubbed flows)
 - 📦 **Offer Zone:** Special deals and quick sells.
 - 📱 **Fully Responsive:** Works smoothly on both mobile and desktop.
 - 🧭 **Category Browsing:** Filter products easily.
@@ -23,7 +23,7 @@ UNiSALE is a campus-based marketplace web app where students can **buy and sell*
 | **React.js** | Frontend UI               |
 | **Tailwind CSS** | Fast, responsive styling  |
 | **Firebase** (v1) | Hosting + Realtime DB   |
-| **Appwrite** | Authentication backend    |
+| **Appwrite** | (removed)                 |
 | **React Router** | Page navigation        |
 | *(Future)*  | MongoDB + Express + Node.js |
 

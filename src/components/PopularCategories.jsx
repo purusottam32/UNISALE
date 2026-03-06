@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const categories = [
   { name: "Books", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAbWJY-IE77hAf8i3kBO-8oGGJgcmbNWXZV1hI4AOd3gVxbZQWV1dMkDKc7xabgJkMIiRj1qcHBORJzaGc36wYXCcXvuPFg2kjF3J1wKJbOOpllVw50jiufcdJnZWkmLFg6uAGhgVs07PKpXFf6A4YDhOmQVhpbWm57FjdyjIU2gW6xyQtdN21Zxi4BSHzJAZU67vtunZfvD2gQA_KYqbtqsC0d6yYKKrb-w8CMvuIFRouZsX3LiHCKEPlfIYqCyxUhvCgmGKCs-g" },
@@ -9,18 +10,40 @@ const categories = [
 ];
 
 function PopularCategories() {
+  const navigate = useNavigate();
+
+  const handleCategoryClick = (categoryName) => {
+    console.log('Category clicked:', categoryName);
+    navigate(`/results?cat=${encodeURIComponent(categoryName.toLowerCase())}`);
+  };
+
+  const handleCategorySubmit = (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const cat = form.elements?.cat?.value || "";
+    if (cat) {
+      navigate(`/results?cat=${encodeURIComponent(cat.toLowerCase())}`);
+    }
+  };
+
   return (
     <>
       <h2 className="text-[#131712] text-[22px] font-bold px-4 pb-3 pt-5">Popular Categories</h2>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
         {categories.map((cat) => (
-          <div key={cat.name} className="flex flex-col gap-3 pb-3">
-            <div
-              className="w-full aspect-square bg-cover bg-center rounded-xl"
-              style={{ backgroundImage: `url(${cat.url})` }}
-            ></div>
-            <p className="text-[#131712] text-base font-medium">{cat.name}</p>
-          </div>
+          <form key={cat.name} onSubmit={handleCategorySubmit} className="flex flex-col gap-3 pb-3">
+            <input type="hidden" name="cat" value={cat.name} />
+            <button type="submit" className="p-0 border-0 bg-transparent text-left cursor-pointer hover:opacity-80 transition-opacity">
+              <img
+                src={cat.url}
+                alt={cat.name}
+                loading="lazy"
+                onError={(e) => { e.currentTarget.src = '/fallback.svg'; }}
+                className="w-full aspect-square object-cover rounded-xl"
+              />
+              <p className="text-[#131712] text-base font-medium mt-2">{cat.name}</p>
+            </button>
+          </form>
         ))}
       </div>
     </>

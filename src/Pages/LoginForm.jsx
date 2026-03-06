@@ -4,9 +4,6 @@ import InputBox from "../components/InputBox";
 import AuthButton from "../components/AuthButton";
 import { useDispatch } from "react-redux";
 import { Link,useNavigate } from "react-router-dom";
-import authService from "../appwrite/auth";
-import { setUser } from "../redux/authSlice";
-import Homepage from "../Pages/Homepage";
 
 const LoginForm = () => {
   const [form, setForm] = useState({
@@ -38,19 +35,12 @@ const LoginForm = () => {
     }
 
      try {
-      await authService.logOut(); // ✅ Ensure old session is cleared
-      const account =await authService.login(form); // ✅ Call login from AuthService
-      if (account) {
-        const currentUser = await authService.getCurrentUser(); 
-        if (currentUser) {
-          dispatch(setUser(currentUser));
-          console.log("navigating to home");
-          navigate("/"); 
-        } 
-      }
+      // No backend: simulate success and navigate to homepage
+      console.log("Login data (no backend):", form);
+      navigate("/");
     } catch (err) {
-      setError(err.message || "Login failed. Please check your credentials.");
-    } 
+      setError(err.message || "Login failed.");
+    }
 
 
     // react-query mutation or redux d ispatch can go here
