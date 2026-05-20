@@ -1,73 +1,60 @@
-import mongoose from "mongoose";
+import { ZodError } from "zod";
 import AppError from "../utils/apiError.js";
 
-export const validateRequiredFields = (fields) => (req, res, next) => {
-  const missingFields = fields.filter((field) => {
-    const value = req.body[field];
-    return value === undefined || value === null || String(value).trim() === "";
+/**
+ * Zod validation middleware factory.
+ * Validates req.body against the given Zod schema.
+ * On failure, throws a 422 AppError with formatted field errors.
+ *
+ * Usage: router.post('/route', validate(mySchema), controller)
+ */
+export const validate = (schema) => (req, res, next) => {
+  try {
+    const parsed = schema.parse(req.body);
+    req.body = parsed; // replace with coerced/transformed values
+    next();
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const details = error.errors.map((e) => ({
+        field: e.path.join("."),
+        message: e.message,
+      }));
+
+      return next(new AppError("Validation failed.", 422, details));
+    }
+    next(error);
+  }
+};
+
+/**
+ * Validates req.query instead of req.body.
+ */
+/**
+ * Coerces multipart/form-data string values before Zod validation.
+ * Usage: router.post('/route', upload.single('file'), coerceFormBody(['year']), validate(schema), ...)
+ */
+export const coerceFormBody = (numericFields = []) => (req, res, next) => {
+  numericFields.forEach((field) => {
+    if (req.body[field] !== undefined && req.body[field] !== "") {
+      req.body[field] = Number(req.body[field]);
+    }
   });
-
-  if (missingFields.length > 0) {
-    next(new AppError(`Missing required fields: ${missingFields.join(", ")}`, 400));
-    return;
-  }
-
   next();
 };
 
-export const validateEmailField = (fieldName = "email") => (req, res, next) => {
-  const email = req.body[fieldName];
-
-  if (!email) {
+export const validateQuery = (schema) => (req, res, next) => {
+  try {
+    const parsed = schema.parse(req.query);
+    req.query = parsed;
     next();
-    return;
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const details = error.errors.map((e) => ({
+        field: e.path.join("."),
+        message: e.message,
+      }));
+      return next(new AppError("Invalid query parameters.", 422, details));
+    }
+    next(error);
   }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!emailRegex.test(String(email).toLowerCase())) {
-    next(new AppError("Please provide a valid email address.", 400));
-    return;
-  }
-
-  next();
-};
-
-export const validatePriceField = (fieldName = "price") => (req, res, next) => {
-  const value = req.body[fieldName];
-  const price = Number(value);
-
-  if (Number.isNaN(price) || price < 0) {
-    next(new AppError("Price must be a number greater than or equal to 0.", 400));
-    return;
-  }
-
-  next();
-};
-
-export const validateObjectIdField = (fieldName) => (req, res, next) => {
-  const value = req.body[fieldName];
-
-  if (value === undefined || value === null || value === "") {
-    next();
-    return;
-  }
-
-  if (!mongoose.Types.ObjectId.isValid(value)) {
-    next(new AppError(`Invalid ${fieldName}.`, 400));
-    return;
-  }
-
-  next();
-};
-
-export const validateObjectIdParam = (paramName = "id") => (req, res, next) => {
-  const value = req.params[paramName];
-
-  if (!mongoose.Types.ObjectId.isValid(value)) {
-    next(new AppError(`Invalid ${paramName}.`, 400));
-    return;
-  }
-
-  next();
 };

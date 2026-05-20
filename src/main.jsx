@@ -1,10 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { Provider } from "react-redux";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
-import { store } from "./redux/store";
 import { queryClient } from "./lib/queryClient";
 import { AuthProvider } from "./context/AuthContext";
 import "./index.css";
@@ -14,12 +12,29 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Provider store={store}>
-          <AuthProvider>
-            <App />
-            <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
-          </AuthProvider>
-        </Provider>
+        <AuthProvider>
+          <App />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 3500,
+              style: {
+                background: "var(--color-surface-2)",
+                color: "var(--color-text-primary)",
+                border: "1px solid var(--color-border)",
+                borderRadius: "var(--radius-md)",
+                fontSize: "14px",
+                fontFamily: "'Inter', sans-serif",
+              },
+              success: {
+                iconTheme: { primary: "var(--color-success)", secondary: "transparent" },
+              },
+              error: {
+                iconTheme: { primary: "var(--color-error)", secondary: "transparent" },
+              },
+            }}
+          />
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>

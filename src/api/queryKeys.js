@@ -7,6 +7,11 @@ export const queryKeys = {
     list: (params = {}) => ["products", "list", params],
     detail: (id) => ["products", "detail", id],
   },
+  listings: {
+    all: ["listings"],
+    list: (params = {}) => ["listings", "list", params],
+    detail: (id) => ["listings", "detail", id],
+  },
   users: {
     products: (userId, params = {}) => ["users", userId, "products", params],
   },

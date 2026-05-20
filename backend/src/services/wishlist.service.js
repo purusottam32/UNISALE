@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
-import Product from "../models/product.model.js";
+import Listing from "../models/listing.model.js";
 import Wishlist from "../models/wishlist.model.js";
 import AppError from "../utils/apiError.js";
 
 const populateWishlistProduct = {
   path: "productId",
-  select: "title description price category images seller createdAt",
+  select: "title description price category images type condition status college views seller createdAt",
   populate: {
     path: "seller",
     select: "name email avatar createdAt",
@@ -17,9 +17,9 @@ export const addToWishlistService = async ({ userId, productId }) => {
     throw new AppError("Invalid product id.", 400);
   }
 
-  const product = await Product.findById(productId).select("_id");
-  if (!product) {
-    throw new AppError("Product not found.", 404);
+  const listing = await Listing.findById(productId).select("_id status");
+  if (!listing || listing.status === "deleted") {
+    throw new AppError("Listing not found.", 404);
   }
 
   const wishlistItem = await Wishlist.findOneAndUpdate(

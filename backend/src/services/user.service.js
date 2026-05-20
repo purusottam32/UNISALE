@@ -1,7 +1,7 @@
 import User from "../models/user.model.js";
 import Product from "../models/product.model.js";
 import AppError from "../utils/apiError.js";
-import { uploadBufferToCloudinary } from "../utils/cloudinary.js";
+import { uploadImageToR2 } from "../utils/r2.js";
 
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -42,14 +42,14 @@ export const registerUserService = async ({ name, email, password, avatarFile })
 
   let avatar = {
     url: "",
-    publicId: "",
+    key: "",
   };
 
   if (avatarFile?.buffer) {
-    const uploadedAvatar = await uploadBufferToCloudinary(avatarFile.buffer, "unisale/avatars");
+    const uploadedAvatar = await uploadImageToR2(avatarFile.buffer, "avatars");
     avatar = {
-      url: uploadedAvatar.secure_url,
-      publicId: uploadedAvatar.public_id,
+      url: uploadedAvatar.url,
+      key: uploadedAvatar.key,
     };
   }
 

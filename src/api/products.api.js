@@ -1,16 +1,17 @@
-import api from "./axios";
+import {
+  getListingsRequest,
+  searchListingsRequest,
+  getListingByIdRequest,
+  createListingRequest,
+  updateListingRequest,
+  updateListingStatusRequest,
+  deleteListingRequest,
+} from "./listings.api";
 
-export const getProductsRequest = (params = {}) => api.get("/products", { params });
-
-export const searchProductsRequest = (params = {}) => api.get("/products/search", { params });
-
-export const getProductByIdRequest = (id) => api.get(`/products/${id}`);
-
-export const createProductRequest = (formData) =>
-  api.post("/products", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-
-export const deleteProductRequest = (id) => api.delete(`/products/${id}`);
+export const getProductsRequest = getListingsRequest;
+export const searchProductsRequest = searchListingsRequest;
+export const getProductByIdRequest = getListingByIdRequest;
+export const createProductRequest = createListingRequest;
+export const updateProductRequest = updateListingRequest;
+export const updateProductStatusRequest = updateListingStatusRequest;
+export const deleteProductRequest = deleteListingRequest;

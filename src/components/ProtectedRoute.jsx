@@ -1,20 +1,24 @@
-import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
-  const location = useLocation();
+/**
+ * Requires authenticated + email verified.
+ * Optionally requires profile complete.
+ */
+export default function ProtectedRoute({ children, requireComplete = false }) {
+  const { isAuthenticated, isLoading, isEmailVerified, isProfileComplete } = useAuth();
 
   if (isLoading) {
-    return <div className="py-16 text-center text-[#6d8566]">Checking session...</div>;
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
+        <div className="spinner" style={{ width: 32, height: 32 }} />
+      </div>
+    );
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
-  }
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isEmailVerified) return <Navigate to="/verify-otp" replace />;
+  if (requireComplete && !isProfileComplete) return <Navigate to="/complete-profile" replace />;
 
   return children;
-};
-
-export default ProtectedRoute;
+}

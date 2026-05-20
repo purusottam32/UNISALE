@@ -4,7 +4,7 @@ import { queryKeys } from "../api/queryKeys";
 
 const useProductDetails = (id) => {
   return useQuery({
-    queryKey: queryKeys.products.detail(id),
+    queryKey: queryKeys.listings.detail(id),
     enabled: Boolean(id),
     queryFn: async () => {
       const response = await getProductByIdRequest(id);

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
-import Product from "../models/product.model.js";
+import Listing from "../models/listing.model.js";
 import User from "../models/user.model.js";
 import AppError from "../utils/apiError.js";
 
@@ -29,12 +29,12 @@ export const startConversationService = async ({ currentUserId, sellerId, produc
       throw new AppError("Invalid product id.", 400);
     }
 
-    const product = await Product.findById(productId).select("_id");
-    if (!product) {
-      throw new AppError("Product not found.", 404);
+    const listing = await Listing.findById(productId).select("_id status seller");
+    if (!listing || listing.status === "deleted") {
+      throw new AppError("Listing not found.", 404);
     }
 
-    normalizedProductId = product._id;
+    normalizedProductId = listing._id;
   }
 
   const conversationQuery = {

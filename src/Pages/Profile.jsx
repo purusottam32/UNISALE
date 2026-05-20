@@ -1,22 +1,24 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import AuthButton from "../components/AuthButton";
-import ProductCard from "../components/ProductCard";
+import ListingCard from "../components/listing/ListingCard";
 import { useAuth } from "../context/AuthContext";
 import useUserProducts from "../hooks/useUserProducts";
 import useWishlist from "../hooks/useWishlist";
-import { useDeleteProductMutation } from "../hooks/useProductMutations";
+import {
+  useDeleteListingMutation,
+  useUpdateListingStatusMutation,
+} from "../hooks/useListingMutations";
 import { getErrorMessage } from "../utils/getErrorMessage";
 
 function Profile() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const deleteProductMutation = useDeleteProductMutation();
-  const [deletingId, setDeletingId] = useState(null);
+  const deleteMutation = useDeleteListingMutation();
+  const statusMutation = useUpdateListingStatusMutation();
+  const [actionLoading, setActionLoading] = useState(false);
 
   const productQueryParams = useMemo(() => ({ page: 1, limit: 20 }), []);
-
   const userProductsQuery = useUserProducts(user?.id, productQueryParams, {
     enabled: Boolean(user?.id),
   });
@@ -30,115 +32,116 @@ function Profile() {
   } = useWishlist();
 
   useEffect(() => {
-    if (userProductsQuery.error) {
-      toast.error(userProductsQuery.error);
-    }
+    if (userProductsQuery.error) toast.error(userProductsQuery.error);
   }, [userProductsQuery.error]);
 
   useEffect(() => {
-    if (wishlistError) {
-      toast.error(getErrorMessage(wishlistError, "Failed to load wishlist."));
-    }
+    if (wishlistError) toast.error(getErrorMessage(wishlistError, "Failed to load wishlist."));
   }, [wishlistError]);
 
   const handleLogout = async () => {
     await logout();
-    toast.success("Logged out successfully.");
+    toast.success("Logged out.");
     navigate("/login", { replace: true });
   };
 
-  const handleDelete = async (productId) => {
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this listing?")) return;
+    setActionLoading(true);
     try {
-      setDeletingId(productId);
-      await deleteProductMutation.mutateAsync(productId);
-      toast.success("Product deleted.");
+      await deleteMutation.mutateAsync(id);
+      toast.success("Listing deleted.");
       userProductsQuery.refetch();
-    } catch (requestError) {
-      toast.error(getErrorMessage(requestError, "Failed to delete product."));
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Delete failed."));
     } finally {
-      setDeletingId(null);
+      setActionLoading(false);
+    }
+  };
+
+  const handleStatus = async (id, status) => {
+    setActionLoading(true);
+    try {
+      await statusMutation.mutateAsync({ id, status });
+      toast.success(`Marked as ${status}.`);
+      userProductsQuery.refetch();
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Update failed."));
+    } finally {
+      setActionLoading(false);
     }
   };
 
   if (!user) {
-    return <div className="py-16 text-center text-[#6d8566]">Loading profile...</div>;
+    return <div className="py-16 text-center text-text-muted">Loading profile...</div>;
   }
 
-  const myProducts = userProductsQuery.products;
-  const wishlistProducts = wishlistItems
-    .map((item) => item.productId)
-    .filter(Boolean);
+  const myListings = userProductsQuery.products;
+  const wishlistProducts = wishlistItems.map((item) => item.productId).filter(Boolean);
 
   return (
-    <div className="flex flex-col w-full max-w-[1100px] py-5 mx-auto gap-6">
-      <div className="rounded-xl border border-[#f1f4f1] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div className="flex flex-col w-full max-w-6xl py-5 mx-auto gap-8">
+      <div className="card p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#131712]">Profile</h1>
-          <p className="text-[#6d8566] mt-2">Name: {user.name}</p>
-          <p className="text-[#6d8566]">Email: {user.email}</p>
+          <h1 className="font-display text-2xl font-bold">Profile</h1>
+          <p className="text-text-secondary mt-1">{user.name}</p>
+          <p className="text-text-muted text-sm">{user.email}</p>
+          {user.college && <p className="text-sm text-primary mt-1">🎓 {user.college}</p>}
         </div>
-
-        <div className="max-w-[220px] w-full">
-          <AuthButton label="Logout" onClick={handleLogout} variant="ghost" />
+        <div className="flex gap-2">
+          <Link to="/create-listing" className="btn btn-primary btn-sm">Sell item</Link>
+          <button type="button" onClick={handleLogout} className="btn btn-secondary btn-sm">Logout</button>
         </div>
       </div>
 
-      <div className="rounded-xl border border-[#f1f4f1] p-5">
-        <h2 className="text-xl font-bold text-[#131712] mb-3">My Listings</h2>
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold">My Listings</h2>
+          <Link to="/create-listing" className="text-sm text-primary font-medium">+ New listing</Link>
+        </div>
 
         {userProductsQuery.loading ? (
-          <p className="text-[#6d8566]">Loading your products...</p>
-        ) : myProducts.length === 0 ? (
-          <div className="text-[#6d8566]">
-            No products listed yet. <Link to="/offer-zone" className="underline">Add one now</Link>.
+          <p className="text-text-muted">Loading...</p>
+        ) : myListings.length === 0 ? (
+          <div className="card p-8 text-center text-text-secondary">
+            No listings yet.{" "}
+            <Link to="/create-listing" className="text-primary underline">Create your first</Link>
           </div>
         ) : (
-          <div className="space-y-3">
-            {myProducts.map((item) => (
-              <div
-                key={item._id}
-                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border border-[#f1f4f1] rounded-lg p-3"
-              >
-                <div>
-                  <Link to={`/products/${item._id}`} className="font-semibold text-[#131712] underline">
-                    {item.title}
-                  </Link>
-                  <p className="text-sm text-[#6d8566]">Rs. {Number(item.price).toLocaleString()}</p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleDelete(item._id)}
-                  disabled={deletingId === item._id}
-                  className="rounded-full px-4 py-2 bg-[#f2f4f1] text-sm font-bold text-[#131612] disabled:opacity-60"
-                >
-                  {deletingId === item._id ? "Deleting..." : "Delete"}
-                </button>
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {myListings.map((listing) => (
+              <ListingCard
+                key={listing._id}
+                listing={listing}
+                showOwnerActions
+                actionLoading={actionLoading}
+                onMarkSold={(id) => handleStatus(id, "sold")}
+                onMarkPaused={(id) => handleStatus(id, "paused")}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         )}
-      </div>
+      </section>
 
-      <div className="rounded-xl border border-[#f1f4f1] p-5">
-        <h2 className="text-xl font-bold text-[#131712] mb-3">My Wishlist</h2>
-
+      <section>
+        <h2 className="text-xl font-bold mb-4">Wishlist</h2>
         {wishlistProducts.length === 0 ? (
-          <p className="text-[#6d8566]">No wishlist items yet.</p>
+          <p className="text-text-muted">No saved items yet.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {wishlistProducts.map((product) => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                isWishlisted={wishlistProductIds.includes(product._id?.toString())}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {wishlistProducts.map((listing) => (
+              <ListingCard
+                key={listing._id}
+                listing={listing}
+                isWishlisted={wishlistProductIds.includes(listing._id?.toString())}
                 onToggleWishlist={toggleWishlist}
                 isWishlistLoading={isToggling}
               />
             ))}
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }

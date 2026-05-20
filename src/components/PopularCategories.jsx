@@ -18,7 +18,7 @@ function PopularCategories() {
     const category = form.elements?.cat?.value || "";
 
     if (category) {
-      navigate(`/results?cat=${encodeURIComponent(category)}`);
+      navigate(`/results?category=${encodeURIComponent(category)}`);
     }
   };
 
