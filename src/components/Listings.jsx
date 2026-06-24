@@ -1,4 +1,7 @@
+"use client";
+
 import React from 'react';
+import Image from "next/image";
 
 const items = [
   {
@@ -33,13 +36,14 @@ export default function Listings() {
     <div className="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
         {items.map((item, i) => (
         <div key={i} className="flex flex-col gap-3 pb-3">
-          <img
-            src={item.image}
-            alt={item.title}
-            loading="lazy"
-            onError={(e) => { e.currentTarget.src = '/fallback.svg'; }}
-            className="w-full bg-center bg-no-repeat aspect-square object-cover rounded-lg"
-          />
+          <div className="relative w-full aspect-square rounded-lg overflow-hidden">
+            <Image
+              src={item.image}
+              alt={item.title}
+              fill
+              className="object-cover"
+            />
+          </div>
           <div>
             <p className="text-[#131712] text-base font-medium leading-normal">{item.title}</p>
             <p className="text-[#6d8566] text-sm font-normal leading-normal">{item.price}</p>

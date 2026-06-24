@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const categories = [
   { name: "Books", url: "https://lh3.googleusercontent.com/aida-public/AB6AXuAbWJY-IE77hAf8i3kBO-8oGGJgcmbNWXZV1hI4AOd3gVxbZQWV1dMkDKc7xabgJkMIiRj1qcHBORJzaGc36wYXCcXvuPFg2kjF3J1wKJbOOpllVw50jiufcdJnZWkmLFg6uAGhgVs07PKpXFf6A4YDhOmQVhpbWm57FjdyjIU2gW6xyQtdN21Zxi4BSHzJAZU67vtunZfvD2gQA_KYqbtqsC0d6yYKKrb-w8CMvuIFRouZsX3LiHCKEPlfIYqCyxUhvCgmGKCs-g" },
@@ -10,7 +13,7 @@ const categories = [
 ];
 
 function PopularCategories() {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const handleCategorySubmit = (event) => {
     event.preventDefault();
@@ -18,7 +21,7 @@ function PopularCategories() {
     const category = form.elements?.cat?.value || "";
 
     if (category) {
-      navigate(`/results?category=${encodeURIComponent(category)}`);
+      router.push(`/results?category=${encodeURIComponent(category)}`);
     }
   };
 
@@ -31,17 +34,16 @@ function PopularCategories() {
             <input type="hidden" name="cat" value={category.name} />
             <button
               type="submit"
-              className="p-0 border-0 bg-transparent text-left cursor-pointer hover:opacity-80 transition-opacity"
+              className="p-0 border-0 bg-transparent text-left cursor-pointer hover:opacity-80 transition-colors"
             >
-              <img
-                src={category.url}
-                alt={category.name}
-                loading="lazy"
-                onError={(event) => {
-                  event.currentTarget.src = "/fallback.svg";
-                }}
-                className="w-full aspect-square object-cover rounded-xl"
-              />
+              <div className="relative w-full aspect-square rounded-xl overflow-hidden">
+                <Image
+                  src={category.url}
+                  alt={category.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
               <p className="text-[#131712] text-base font-medium mt-2">{category.name}</p>
             </button>
           </form>

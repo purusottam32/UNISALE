@@ -1,11 +1,14 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 import toast from "react-hot-toast";
 import { FaRegCommentDots, FaRegHeart } from "react-icons/fa";
 import { FiLogIn, FiUserPlus } from "react-icons/fi";
-import Logo from "../assets/Logo.svg";
-import { useAuth } from "../context/AuthContext";
-import useProducts from "../hooks/useProducts";
+import { useAuth } from "@/context/AuthContext";
+import useProducts from "@/hooks/useProducts";
 
 function Navbar() {
   const [searchInput, setSearchInput] = useState("");
@@ -13,7 +16,8 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const navigate = useNavigate();
+  const router = useRouter();
+  const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
@@ -33,7 +37,7 @@ function Navbar() {
     event.preventDefault();
 
     if (searchInput.trim()) {
-      navigate(`/results?q=${encodeURIComponent(searchInput.trim())}`);
+      router.push(`/results?q=${encodeURIComponent(searchInput.trim())}`);
       setShowSuggestions(false);
       setMenuOpen(false);
     }
@@ -42,28 +46,30 @@ function Navbar() {
   const handleLogout = async () => {
     await logout();
     toast.success("Logged out successfully.");
-    navigate("/login");
+    router.push("/login");
   };
 
-  const navLinkClass = ({ isActive }) =>
-    `text-sm font-medium transition-colors ${isActive ? "text-primary" : "text-text-secondary hover:text-text-primary"}`;
+  const isActive = (href) => pathname === href;
+
+  const navLinkClass = (href) =>
+    `text-sm font-medium transition-colors ${isActive(href) ? "text-primary" : "text-text-secondary hover:text-text-primary"}`;
 
   return (
     <header className="border-b border-border bg-surface/80 backdrop-blur-md px-4 sm:px-10 py-3 w-full sticky top-0 z-40">
       <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
-        <NavLink to={isAuthenticated ? "/feed" : "/"} className="flex items-center gap-4">
-          <img src={Logo} width="100" height="40" alt="UNISALE logo" className="mb-2 brightness-0 invert opacity-90" />
-        </NavLink>
+        <Link href={isAuthenticated ? "/feed" : "/"} className="flex items-center gap-4">
+          <Image src="/Logo.svg" width="100" height="40" alt="UNISALE logo" className="mb-2 brightness-0 invert opacity-90" />
+        </Link>
 
         <div className="hidden sm:flex items-center gap-8 ml-10">
-          <NavLink className={navLinkClass} to={isAuthenticated ? "/feed" : "/"}>
+          <Link className={navLinkClass(isAuthenticated ? "/feed" : "/")} href={isAuthenticated ? "/feed" : "/"}>
             {isAuthenticated ? "Feed" : "Home"}
-          </NavLink>
-          <NavLink className={navLinkClass} to="/explore">Explore</NavLink>
+          </Link>
+          <Link className={navLinkClass("/explore")} href="/explore">Explore</Link>
           {isAuthenticated && (
             <>
-              <NavLink className={navLinkClass} to="/create-listing">Sell</NavLink>
-              <NavLink className={navLinkClass} to="/chat">Chat</NavLink>
+              <Link className={navLinkClass("/create-listing")} href="/create-listing">Sell</Link>
+              <Link className={navLinkClass("/chat")} href="/chat">Chat</Link>
             </>
           )}
         </div>
@@ -101,7 +107,7 @@ function Navbar() {
                       key={product._id}
                       type="button"
                       onClick={() => {
-                        navigate(`/listings/${product._id}`);
+                        router.push(`/listings/${product._id}`);
                         setShowSuggestions(false);
                         setSearchInput("");
                       }}
@@ -118,31 +124,31 @@ function Navbar() {
 
           {isAuthenticated && (
             <>
-              <NavLink
-                to="/profile"
+              <Link
+                href="/profile"
                 className="rounded-full h-10 w-10 bg-surface-2 border border-border flex items-center justify-center text-text-secondary hover:text-primary transition-colors"
                 title="Wishlist"
               >
                 <FaRegHeart />
-              </NavLink>
-              <NavLink
-                to="/chat"
+              </Link>
+              <Link
+                href="/chat"
                 className="rounded-full h-10 w-10 bg-surface-2 border border-border flex items-center justify-center text-text-secondary hover:text-primary transition-colors"
                 title="Chats"
               >
                 <FaRegCommentDots />
-              </NavLink>
+              </Link>
             </>
           )}
 
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
-              <NavLink
-                to="/profile"
+              <Link
+                href="/profile"
                 className="rounded-full h-10 px-5 bg-surface-2 border border-border text-sm font-semibold flex items-center text-text-primary hover:border-primary/40 transition-colors"
               >
                 {user?.name?.split(" ")[0] || "Profile"}
-              </NavLink>
+              </Link>
               <button
                 type="button"
                 onClick={handleLogout}
@@ -153,14 +159,14 @@ function Navbar() {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <NavLink to="/login" className="btn btn-ghost btn-sm">
+              <Link href="/login" className="btn btn-ghost btn-sm">
                 <FiLogIn />
                 Login
-              </NavLink>
-              <NavLink to="/register" className="btn btn-primary btn-sm">
+              </Link>
+              <Link href="/register" className="btn btn-primary btn-sm">
                 <FiUserPlus />
                 Sign up
-              </NavLink>
+              </Link>
             </div>
           )}
         </div>
@@ -180,20 +186,20 @@ function Navbar() {
 
       {menuOpen && (
         <div className="sm:hidden mt-3 px-4 space-y-4 pb-2">
-          <NavLink className="block text-text-secondary text-sm font-medium" to={isAuthenticated ? "/feed" : "/"} onClick={() => setMenuOpen(false)}>
+          <Link className="block text-text-secondary text-sm font-medium" href={isAuthenticated ? "/feed" : "/"} onClick={() => setMenuOpen(false)}>
             {isAuthenticated ? "Feed" : "Home"}
-          </NavLink>
-          <NavLink className="block text-text-secondary text-sm font-medium" to="/category" onClick={() => setMenuOpen(false)}>
+          </Link>
+          <Link className="block text-text-secondary text-sm font-medium" href="/category" onClick={() => setMenuOpen(false)}>
             Categories
-          </NavLink>
+          </Link>
           {isAuthenticated && (
             <>
-              <NavLink className="block text-text-secondary text-sm font-medium" to="/create-listing" onClick={() => setMenuOpen(false)}>
+              <Link className="block text-text-secondary text-sm font-medium" href="/create-listing" onClick={() => setMenuOpen(false)}>
                 Sell
-              </NavLink>
-              <NavLink className="block text-text-secondary text-sm font-medium" to="/chat" onClick={() => setMenuOpen(false)}>
+              </Link>
+              <Link className="block text-text-secondary text-sm font-medium" href="/chat" onClick={() => setMenuOpen(false)}>
                 Chat
-              </NavLink>
+              </Link>
             </>
           )}
 
@@ -221,12 +227,12 @@ function Navbar() {
             </button>
           ) : (
             <div className="flex flex-col gap-2">
-              <NavLink to="/login" className="btn btn-secondary btn-full" onClick={() => setMenuOpen(false)}>
+              <Link href="/login" className="btn btn-secondary btn-full" onClick={() => setMenuOpen(false)}>
                 Login
-              </NavLink>
-              <NavLink to="/register" className="btn btn-primary btn-full" onClick={() => setMenuOpen(false)}>
+              </Link>
+              <Link href="/register" className="btn btn-primary btn-full" onClick={() => setMenuOpen(false)}>
                 Sign up
-              </NavLink>
+              </Link>
             </div>
           )}
         </div>

@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import Image from "next/image";
 
 const items = [
   {
@@ -66,13 +69,14 @@ function FeaturedItems() {
               key={index}
               className="w-[160px] sm:w-[180px] flex flex-col gap-3 rounded-lg"
             >
-                <img
-                  src={item.url}
-                  alt={item.name}
-                  loading="lazy"
-                  onError={(e) => { e.currentTarget.src = '/fallback.svg'; }}
-                  className="w-full aspect-square bg-center bg-no-repeat object-cover rounded-xl"
-                />
+                <div className="relative w-full aspect-square rounded-xl overflow-hidden">
+                  <Image
+                    src={item.url}
+                    alt={item.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               <div>
                 <p className="text-[#131712] text-sm font-medium truncate">
                   {item.name}

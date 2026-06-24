@@ -1,5 +1,10 @@
-import { Link, useNavigate } from "react-router-dom";
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FiMapPin } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import { getErrorMessage } from "../../utils/getErrorMessage";
@@ -29,7 +34,7 @@ export default function ListingCard({
   actionLoading = false,
 }) {
   const item = listing || product;
-  const navigate = useNavigate();
+  const router = useRouter();
   const { isAuthenticated } = useAuth();
 
   const listingId = item?._id || item?.id;
@@ -43,7 +48,7 @@ export default function ListingCard({
     if (!onToggleWishlist || !listingId) return;
     if (!isAuthenticated) {
       toast.error("Please login to use wishlist.");
-      navigate("/login");
+      router.push("/login");
       return;
     }
     try {
@@ -63,14 +68,13 @@ export default function ListingCard({
 
   return (
     <div className="card card-interactive overflow-hidden">
-      <Link to={`/listings/${listingId}`} className="block">
+      <Link href={`/listings/${listingId}`} className="block">
         <div className="relative w-full aspect-square bg-surface-2 overflow-hidden">
-          <img
+          <Image
             src={imageUrl}
-            alt={item?.title}
-            loading="lazy"
-            onError={(e) => { e.currentTarget.src = "/fallback.svg"; }}
-            className="w-full h-full object-cover"
+            alt={item?.title || ""}
+            fill
+            className="object-cover"
           />
           {imageCount > 1 && (
             <span className="absolute bottom-2 left-2 badge badge-muted text-xs">
@@ -106,7 +110,10 @@ export default function ListingCard({
             {item?.type === "rent" && <span className="text-xs font-normal text-text-muted"> / negotiable</span>}
           </p>
           {item?.college && (
-            <p className="text-xs text-primary mb-2 line-clamp-1">📍 {item.college}</p>
+            <p className="text-xs text-text-secondary mb-2 line-clamp-1 flex items-center gap-1">
+              <FiMapPin className="shrink-0" />
+              {item.college}
+            </p>
           )}
           <div className="text-xs text-text-secondary">
             <p className="font-medium text-text-primary">{sellerName}</p>
@@ -117,7 +124,7 @@ export default function ListingCard({
 
       {showOwnerActions && (
         <div className="px-4 pb-4 flex flex-wrap gap-2 border-t border-border pt-3">
-          <Link to={`/listings/${listingId}/edit`} className="btn btn-secondary btn-sm">Edit</Link>
+          <Link href={`/listings/${listingId}/edit`} className="btn btn-secondary btn-sm">Edit</Link>
           {item?.status === "active" && (
             <>
               <button type="button" className="btn btn-ghost btn-sm" disabled={actionLoading} onClick={() => onMarkSold?.(listingId)}>

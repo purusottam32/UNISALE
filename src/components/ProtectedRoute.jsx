@@ -1,12 +1,19 @@
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+"use client";
 
-/**
- * Requires authenticated + email verified.
- * Optionally requires profile complete.
- */
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+
 export default function ProtectedRoute({ children, requireComplete = false }) {
+  const router = useRouter();
   const { isAuthenticated, isLoading, isEmailVerified, isProfileComplete } = useAuth();
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (!isAuthenticated) router.replace("/login");
+    else if (!isEmailVerified) router.replace("/verify-otp");
+    else if (requireComplete && !isProfileComplete) router.replace("/complete-profile");
+  }, [isLoading, isAuthenticated, isEmailVerified, isProfileComplete, requireComplete, router]);
 
   if (isLoading) {
     return (
@@ -16,9 +23,9 @@ export default function ProtectedRoute({ children, requireComplete = false }) {
     );
   }
 
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (!isEmailVerified) return <Navigate to="/verify-otp" replace />;
-  if (requireComplete && !isProfileComplete) return <Navigate to="/complete-profile" replace />;
+  if (!isAuthenticated || !isEmailVerified || (requireComplete && !isProfileComplete)) {
+    return null;
+  }
 
   return children;
 }

@@ -1,13 +1,12 @@
-import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { setStoredToken } from "../api/axios";
-import { useAuth } from "../context/AuthContext";
+"use client";
 
-/**
- * Captures ?token= from OAuth redirects, stores it, and refreshes the user profile.
- */
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { setStoredToken } from "@/api/axios";
+import { useAuth } from "@/context/AuthContext";
+
 export default function OAuthTokenHandler() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const { refreshProfile } = useAuth();
 
   useEffect(() => {
@@ -16,11 +15,11 @@ export default function OAuthTokenHandler() {
 
     setStoredToken(token);
     refreshProfile().finally(() => {
-      const next = new URLSearchParams(searchParams);
-      next.delete("token");
-      setSearchParams(next, { replace: true });
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("token");
+      window.history.replaceState(null, "", `?${params.toString()}`);
     });
-  }, [searchParams, setSearchParams, refreshProfile]);
+  }, [searchParams, refreshProfile]);
 
   return null;
 }

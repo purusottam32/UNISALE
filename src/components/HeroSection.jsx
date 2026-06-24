@@ -1,8 +1,10 @@
+"use client";
+
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 
 function HeroSection() {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return (
     <div className="w-full">
@@ -24,7 +26,7 @@ function HeroSection() {
           </div>
           <button
             type="button"
-            onClick={() => navigate("/results")}
+            onClick={() => router.push("/results")}
             className="h-10 sm:h-12 px-4 rounded-full bg-[#50d22c] text-[#131712] text-sm sm:text-base font-bold"
           >
             <span className="truncate">Explore Items</span>

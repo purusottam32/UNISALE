@@ -1,10 +1,13 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useRouter, useParams } from "next/navigation";
 
 export default function SearchBar({ placeholder = "Search" }) {
-  const { query } = useParams();
+  const params = useParams();
+  const query = params?.query;
   const [searchInput, setSearchInput] = useState("");
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     if (query) {
@@ -16,11 +19,11 @@ export default function SearchBar({ placeholder = "Search" }) {
     event.preventDefault();
 
     if (searchInput.trim()) {
-      navigate(`/results?q=${encodeURIComponent(searchInput.trim())}`);
+      router.push(`/results?q=${encodeURIComponent(searchInput.trim())}`);
       return;
     }
 
-    navigate("/results");
+    router.push("/results");
   };
 
   return (

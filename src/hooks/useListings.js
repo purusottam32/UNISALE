@@ -20,6 +20,7 @@ const useListings = (params = {}, options = {}) => {
   const query = useQuery({
     queryKey: queryKeys.listings.list(params),
     enabled: options.enabled ?? true,
+    initialData: options.initialData ? normalizePayload(options.initialData, params.limit) : undefined,
     queryFn: async () => {
       const hasSearch = Boolean(String(params.q || "").trim());
       const request = hasSearch ? searchListingsRequest : getListingsRequest;

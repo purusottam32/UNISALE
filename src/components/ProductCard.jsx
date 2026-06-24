@@ -1,5 +1,9 @@
+"use client";
+
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
@@ -34,7 +38,7 @@ const ProductCard = ({
   onToggleWishlist,
   isWishlistLoading = false,
 }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { isAuthenticated } = useAuth();
 
   const productId = product?._id || product?.id;
@@ -51,7 +55,7 @@ const ProductCard = ({
 
     if (!isAuthenticated) {
       toast.error("Please login to use wishlist.");
-      navigate("/login");
+      router.push("/login");
       return;
     }
 
@@ -65,18 +69,15 @@ const ProductCard = ({
 
   return (
     <Link
-      to={`/products/${productId}`}
+      href={`/products/${productId}`}
       className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-[#eef2ee]"
     >
       <div className="relative w-full aspect-square bg-gray-100 overflow-hidden rounded-lg">
-        <img
+        <Image
           src={imageUrl}
-          alt={product?.title}
-          loading="lazy"
-          onError={(event) => {
-            event.currentTarget.src = "/fallback.svg";
-          }}
-          className="w-full h-full object-cover hover:scale-105 transition-transform"
+          alt={product?.title || ""}
+          fill
+          className="object-cover hover:scale-105 transition-transform"
         />
         <button
           type="button"
