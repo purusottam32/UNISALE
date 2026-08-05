@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LISTING_CATEGORIES } from "../config/constants.js";
 
 // ---------------------
 // Reusable primitives
@@ -59,8 +60,29 @@ const usernameField = z
   .toLowerCase()
   .optional();
 
+/**
+ * Onboarding interests arrive as a JSON string from multipart form bodies, so
+ * accept both shapes and normalise to an array of known categories.
+ */
+const interestsField = z
+  .union([z.array(z.enum(LISTING_CATEGORIES)), z.string()])
+  .optional()
+  .transform((value) => {
+    if (!value) return undefined;
+    if (Array.isArray(value)) return value;
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed)
+        ? parsed.filter((item) => LISTING_CATEGORIES.includes(item))
+        : undefined;
+    } catch {
+      return undefined;
+    }
+  });
+
 export const completeProfileSchema = z.object({
   username: usernameField,
+  interests: interestsField,
   college: z
     .string({ required_error: "College name is required." })
     .min(2, "College name must be at least 2 characters.")

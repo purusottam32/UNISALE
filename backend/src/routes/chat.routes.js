@@ -1,30 +1,28 @@
-import express from "express";
-import mongoose from "mongoose";
+import { Router } from "express";
 import {
   getConversationMessages,
   getConversations,
+  getUnreadTotal,
+  markRead,
   sendMessage,
   startConversation,
+  toggleArchive,
 } from "../controllers/chat.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
-import AppError from "../utils/apiError.js";
-import asyncHandler from "../utils/asyncHandler.js";
+import { validateObjectId } from "../middleware/validation.middleware.js";
 
-const router = express.Router();
+const router = Router();
 router.use(protect);
 
-const validateId = (paramName) =>
-  asyncHandler(async (req, res, next) => {
-    const val = req.params[paramName] || req.body[paramName];
-    if (val && !mongoose.Types.ObjectId.isValid(val)) {
-      throw new AppError(`Invalid ${paramName}.`, 400);
-    }
-    next();
-  });
+const withId = validateObjectId("conversationId");
 
-router.post("/start", startConversation);
 router.get("/conversations", getConversations);
-router.get("/:conversationId", validateId("conversationId"), getConversationMessages);
-router.post("/send", sendMessage);
+router.get("/unread", getUnreadTotal);
+router.post("/conversations", startConversation);
+
+router.get("/conversations/:conversationId", withId, getConversationMessages);
+router.post("/conversations/:conversationId/messages", withId, sendMessage);
+router.patch("/conversations/:conversationId/read", withId, markRead);
+router.patch("/conversations/:conversationId/archive", withId, toggleArchive);
 
 export default router;

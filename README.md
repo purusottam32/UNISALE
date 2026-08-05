@@ -1,268 +1,157 @@
-# UNISALE
+# UniSale
 
-UNISALE is a MERN-based marketplace where college students can buy and sell used products such as books, electronics, notes, and furniture.
+**A campus-exclusive marketplace for college students.** Verify with your college
+email, then buy, sell, rent and exchange with people at your own institution —
+no strangers, no commission, no sharing your phone number.
 
-## Overview
+---
 
-UNISALE solves a common campus problem: students need a trusted and simple way to sell items they no longer use and buy affordable second-hand items from peers.
+## Why it exists
 
-The project includes:
+Every campus already runs a small economy: cycles, calculators, textbooks,
+hostel kettles and second-year notes change hands every semester. Today that
+trade happens over WhatsApp groups, Instagram stories and physical noticeboards
+— with no search, no history, no identity, and no recourse when something goes
+wrong.
 
-- A React frontend with protected routes, marketplace browsing, wishlist, and chat UI.
-- A Node.js + Express backend with JWT auth, product APIs, image uploads, and MongoDB persistence.
+UniSale gives that trade a real home. The one thing that makes it different from
+OLX or Facebook Marketplace is the **verified-student wall**: institutional email
+verification creates a walled garden that general marketplaces cannot replicate
+without rebuilding their identity layer.
 
-## Tech Stack
-
-### Frontend
-
-- React 19
-- Vite 7
-- TailwindCSS 4
-- React Router DOM
-- Axios
-- TanStack Query (React Query)
-- React Hot Toast
-
-### Backend
-
-- Node.js
-- Express.js
-- MongoDB Atlas + Mongoose
-- JWT Authentication (Bearer token + HTTP-only cookie support)
-- Multer (memory storage)
-- Cloudinary (image hosting)
-- Swagger (OpenAPI docs)
-- dotenv
-- cookie-parser
-- cors
-- morgan
-
-## Project Structure
-
-```text
-Unisale/
-|-- backend/
-|   |-- postman/
-|   |   |-- UNISALE.postman_collection.json
-|   |-- src/
-|   |   |-- controllers/
-|   |   |   |-- chat.controller.js
-|   |   |   |-- product.controller.js
-|   |   |   |-- user.controller.js
-|   |   |   `-- wishlist.controller.js
-|   |   |-- db/
-|   |   |   `-- db.js
-|   |   |-- docs/
-|   |   |   `-- swagger.js
-|   |   |-- middleware/
-|   |   |   |-- auth.middleware.js
-|   |   |   |-- error.middleware.js
-|   |   |   |-- upload.middleware.js
-|   |   |   `-- validation.middleware.js
-|   |   |-- models/
-|   |   |   |-- conversation.model.js
-|   |   |   |-- message.model.js
-|   |   |   |-- product.model.js
-|   |   |   |-- user.model.js
-|   |   |   `-- wishlist.model.js
-|   |   |-- routes/
-|   |   |   |-- chat.routes.js
-|   |   |   |-- product.routes.js
-|   |   |   |-- user.routes.js
-|   |   |   `-- wishlist.routes.js
-|   |   |-- services/
-|   |   |   |-- chat.service.js
-|   |   |   |-- product.service.js
-|   |   |   |-- user.service.js
-|   |   |   `-- wishlist.service.js
-|   |   |-- utils/
-|   |   |   |-- apiError.js
-|   |   |   |-- asyncHandler.js
-|   |   |   `-- cloudinary.js
-|   |   `-- app.js
-|   |-- .env.example
-|   |-- package.json
-|   `-- server.js
-|-- public/
-|-- src/
-|   |-- api/
-|   |-- components/
-|   |-- context/
-|   |-- hooks/
-|   |-- layout/
-|   |-- lib/
-|   |-- Pages/
-|   |-- App.jsx
-|   `-- main.jsx
-|-- package.json
-`-- README.md
-```
+---
 
 ## Features
 
-- User registration, login, logout, and profile with JWT auth.
-- Product create, list, details, and seller-only delete.
-- Product image upload to Cloudinary.
-- Product search by keyword (title, description, category).
-- Category-based filtering.
-- Pagination for product listing and user products.
-- Wishlist add/view/remove.
-- Buyer-seller chat with conversation list and messages.
-- Profile page with user info, own listings, and wishlist items.
-- Protected frontend routes for selling, profile, and chat.
-- Swagger UI for API exploration.
-- Sample Postman collection for quick API testing.
+**Trust**
+- College email + 6-digit OTP verification, or Google OAuth
+- Computed trust score and earned tiers (New Member → Verified Student → Trusted Seller)
+- Mutual post-deal ratings, restricted to the actual buyer and seller
+- Listing and user reporting, with an admin moderation queue
 
-## Environment Variables
+**Marketplace**
+- Photo-first four-step sell wizard with browser-side image compression
+- Personalised campus feed (recency + demand + interest affinity + listing quality)
+- Trending rail scored by engagement per hour live
+- Full-text search, filter sheet, URL-synced filters, infinite scroll
+- Saved items with automatic price-drop notifications
+- "More like this" recommendations, scoped to your campus
 
-### Backend (`backend/.env`)
+**Communication**
+- Real-time chat over Socket.io with typing indicators, read receipts and presence
+- Automatic REST fallback when WebSockets are blocked
+- Threads grouped by listing; in-app notifications with unread badges
 
-Use `backend/.env.example` as the template.
+**Experience**
+- Light and dark themes, following the OS or an explicit choice
+- Mobile tab bar with a raised Sell action; responsive up to desktop
+- WCAG 2.1 AA focus handling, labelled controls, reduced-motion support
 
-| Variable | Required | Description |
-| --- | --- | --- |
-| `PORT` | Yes | Backend port (default used in code: `5000`) |
-| `MONGO_URI` | Yes | MongoDB Atlas connection string |
-| `JWT_SECRET` | Yes | Secret key used to sign JWT tokens |
-| `CLOUDINARY_CLOUD_NAME` | Yes | Cloudinary cloud name |
-| `CLOUDINARY_API_KEY` | Yes | Cloudinary API key |
-| `CLOUDINARY_API_SECRET` | Yes | Cloudinary API secret |
-| `JWT_EXPIRES_IN` | No | JWT expiry, default is `7d` |
-| `CLIENT_URL` | No | Allowed frontend origin(s) for CORS, default `http://localhost:5173` |
-| `API_BASE_URL` | No | Base URL shown in Swagger server list |
-| `NODE_ENV` | No | `development` or `production` |
+---
 
-### Frontend (root)
+## Tech stack
 
-No required frontend environment variables are currently used for API calls.
-The existing root `.env.sample` contains legacy Appwrite keys and is not used by the current code.
+| | |
+|---|---|
+| **Web** | Next.js 16 (App Router), React 19, Tailwind CSS 4, TanStack Query 5, react-hook-form, socket.io-client |
+| **API** | Node.js, Express 4, MongoDB Atlas + Mongoose 8, Socket.io 4 |
+| **Auth** | JWT access + refresh rotation, HttpOnly cookies, Google OAuth 2.0, bcrypt |
+| **Media** | Cloudflare R2 + Sharp, compressed client-side before upload |
+| **Validation** | Zod on every request body and query |
+| **Security** | Helmet, CORS allowlist, per-route rate limiting, Zod sanitisation |
+| **Docs** | Swagger / OpenAPI at `/api/docs` |
 
-The frontend API base URL is hardcoded in `src/api/axios.js`:
+---
 
-```js
-baseURL: "http://localhost:5000/api";
-```
+## Getting started
 
-## Installation
-
-1. Clone the repository.
-2. Install frontend dependencies from project root.
-3. Install backend dependencies from `backend`.
-4. Create `backend/.env` from `backend/.env.example`.
-5. Start backend and frontend in separate terminals.
+**Requirements:** Node.js 20+, pnpm, a MongoDB Atlas cluster, a Cloudflare R2
+bucket, and SMTP credentials for OTP email.
 
 ```bash
-# 1) clone
-git clone <your-repo-url>
-cd Unisale
-
-# 2) frontend deps
-npm install
-
-# 3) backend deps
+# ── API ── terminal 1
 cd backend
-npm install
+cp .env.example .env          # fill in real values
+pnpm install
+pnpm dev                      # http://localhost:5000 · docs at /api/docs
+
+# ── Web ── terminal 2
+cp .env.sample .env.local     # fill in real values
+pnpm install
+pnpm dev                      # http://localhost:3000
 ```
 
-## API Endpoints
+> `CLIENT_URL` in `backend/.env` must include your web origin, or both CORS and
+> the Google OAuth redirect will fail. The first entry in that list is treated
+> as the canonical web app.
 
-Base URL: `http://localhost:5000`
+### Scripts
 
-### Health
+| Command | Does |
+|---|---|
+| `pnpm dev` | Web app in development |
+| `pnpm build` | Production build + TypeScript check |
+| `pnpm lint` | ESLint over `src/` |
+| `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm api:dev` | Run the backend from the repo root |
 
-- `GET /api/health`
+---
 
-### Users and Auth
+## Project structure
 
-- `POST /api/users/register` (multipart/form-data: `name`, `email`, `password`, optional `avatar`)
-- `POST /api/users/login`
-- `POST /api/users/logout`
-- `GET /api/users/profile` (Protected)
-- `GET /api/users/:id/products`
-
-### Products
-
-- `GET /api/products`
-- `GET /api/products/search?q=keyword`
-- `GET /api/products/:id`
-- `POST /api/products` (Protected, multipart/form-data: `title`, `description`, `price`, `category`, `images`)
-- `DELETE /api/products/:id` (Protected, seller only)
-
-Supported `GET /api/products` query params:
-
-- `page`, `limit`
-- `category`
-- `q` or `search`
-- `minPrice`, `maxPrice`
-- `sortBy` (`createdAt`, `price`, `title`)
-- `sortOrder` (`asc`, `desc`)
-
-### Wishlist (Protected)
-
-- `POST /api/wishlist/add` (body: `productId`)
-- `GET /api/wishlist`
-- `DELETE /api/wishlist/:productId`
-
-### Chat (Protected)
-
-- `POST /api/chat/start` (body: `sellerId`, optional `productId`)
-- `GET /api/chat/conversations`
-- `GET /api/chat/:conversationId`
-- `POST /api/chat/send` (body: `conversationId`, `text`)
-
-### API Documentation
-
-- Swagger UI: `GET /api/docs`
-- OpenAPI JSON: `GET /api/docs.json`
-- Postman collection: `backend/postman/UNISALE.postman_collection.json`
-
-## Running the Project Locally
-
-Run backend and frontend in two terminals.
-
-### Terminal 1: Backend
-
-```bash
-cd backend
-npm run dev
+```
+Unisale/
+├── docs/          ARCHITECTURE.md · UX.md · PRD.md
+├── backend/       Express API + Socket.io
+│   └── src/       config · models · services · controllers · routes
+│                  middleware · validators · sockets · utils
+├── src/           Next.js web app
+│   ├── app/       Routes only — (auth) · (browse) · (app) groups
+│   ├── features/  auth · listings · chat · saved · notifications · profile
+│   ├── components/ ui (design system) · layout (app chrome)
+│   ├── config/    catalog · navigation · site
+│   ├── lib/       api-client · query-keys · format · errors
+│   └── styles/    globals.css — the whole design system
+└── public/
 ```
 
-Backend runs on `http://localhost:5000`.
+---
 
-### Terminal 2: Frontend
+## Documentation
 
-```bash
-cd Unisale
-npm run dev
-```
+| Document | Read it for |
+|---|---|
+| **[docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)** | **Start here.** What lives where, the layering rules, and which file to open for any given change. |
+| [docs/UX.md](./docs/UX.md) | Why the interface behaves the way it does — navigation, onboarding, selling, trust. |
+| [docs/PRD.md](./docs/PRD.md) | Product requirements, personas, roadmap, success metrics. |
 
-Frontend runs on `http://localhost:5173`.
+---
 
-## Deployment
+## API surface
 
-Recommended deployment setup:
+| Group | Endpoints |
+|---|---|
+| Auth | `POST /auth/register` `/verify-otp` `/resend-otp` `/login` `/logout` `/refresh` `/complete-profile` · `GET /auth/me` `/auth/google` |
+| Listings | `GET /listings` `/listings/feed` `/listings/trending` `/listings/search` `/listings/:id` `/listings/:id/similar` · `POST /listings` · `PATCH /listings/:id` `/listings/:id/status` · `DELETE /listings/:id` · `POST /listings/:id/report` |
+| Users | `GET /users/:id` `/users/:id/listings` `/users/:id/reviews` · `PATCH /users/me/notifications` `/users/me/interests` · `POST /users/:id/report` · `DELETE /users/me` |
+| Chat | `GET /chat/conversations` `/chat/unread` `/chat/conversations/:id` · `POST /chat/conversations` `/chat/conversations/:id/messages` · `PATCH /chat/conversations/:id/read` `/archive` |
+| Reviews | `GET /reviews/pending` `/reviews/user/:userId` · `POST /reviews` |
+| Wishlist | `GET /wishlist` `/wishlist/ids` · `POST /wishlist` · `DELETE /wishlist/:listingId` |
+| Notifications | `GET /notifications` `/notifications/badges` · `PATCH /notifications/:id/read` `/read-all` |
+| Admin | `GET /admin/metrics` `/users` `/listings` `/reports` `/domains` · moderation actions |
 
-- Frontend: Vercel
-- Backend: Render or Railway
-- Database: MongoDB Atlas
-- Image Storage: Cloudinary
+**Socket events** — `conversation:join` · `message:send` · `message:new` ·
+`message:read` · `typing:start` / `typing:stop` · `notification:new` ·
+`presence:online` / `presence:offline`
 
-Deployment notes:
+Interactive reference: `http://localhost:5000/api/docs`
 
-- Set production values for backend environment variables.
-- Set `CLIENT_URL` in backend env to your deployed frontend URL.
-- If backend URL changes, update frontend API base URL in `src/api/axios.js`.
+---
 
-## Contribution
+## Roadmap
 
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/your-feature-name`).
-3. Commit your changes.
-4. Push the branch and open a Pull Request.
-5. Include clear descriptions and test steps in the PR.
+Shipped here: MVP (PRD Phase 1) plus most of Phase 2 — ratings, wishlist with
+price-drop alerts, trust scores and in-app notifications.
 
-## License
-
-This project is licensed under the MIT License.
-
-
+Next: web push, multi-campus rollout, seller analytics, featured listings,
+rentals and a student services marketplace. See [docs/PRD.md](./docs/PRD.md) §15.

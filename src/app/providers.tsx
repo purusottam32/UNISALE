@@ -1,41 +1,39 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "react-hot-toast";
-import { queryClient } from "@/lib/queryClient";
-import { AuthProvider } from "@/context/AuthContext";
-import OAuthTokenHandler from "@/components/OAuthTokenHandler";
+import { createQueryClient } from "@/lib/query-client";
+import { AuthProvider } from "@/features/auth/auth-context";
+import OAuthTokenHandler from "@/features/auth/components/OAuthTokenHandler";
+import { SocketProvider } from "@/features/chat/socket-provider";
+import MotionProvider from "@/components/providers/MotionProvider";
+import { TooltipProvider } from "@/components/ui/Tooltip";
+import { ToastViewport } from "@/components/ui/Toast";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
+  // One client per browser session, created lazily so an SSR render never
+  // shares a cache between requests.
+  const [queryClient] = useState(createQueryClient);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Suspense fallback={null}>
-          <OAuthTokenHandler />
-        </Suspense>
-        {children}
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 3500,
-            style: {
-              background: "var(--color-surface-2)",
-              color: "var(--color-text-primary)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-md)",
-              fontSize: "14px",
-              fontFamily: "'Inter', sans-serif",
-            },
-            success: {
-              iconTheme: { primary: "var(--color-success)", secondary: "transparent" },
-            },
-            error: {
-              iconTheme: { primary: "var(--color-error)", secondary: "transparent" },
-            },
-          }}
-        />
-      </AuthProvider>
+      <MotionProvider>
+        {/* One delay for every tooltip in the app — 400ms is long enough that
+            a cursor crossing the screen doesn't trigger a trail of them. */}
+        <TooltipProvider delayDuration={400} skipDelayDuration={200}>
+          <AuthProvider>
+            <SocketProvider>
+              <Suspense fallback={null}>
+                <OAuthTokenHandler />
+              </Suspense>
+
+              {children}
+
+              <ToastViewport />
+            </SocketProvider>
+          </AuthProvider>
+        </TooltipProvider>
+      </MotionProvider>
     </QueryClientProvider>
   );
 }

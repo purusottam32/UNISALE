@@ -1,27 +1,24 @@
 import "dotenv/config";
 import { createServer } from "http";
 import app from "./src/app.js";
-import connectDB from "./src/db/db.js";
-import { initSocket } from "./src/socket/index.js";
-
-const PORT = Number(process.env.PORT) || 5000;
+import config from "./src/config/index.js";
+import connectDB from "./src/config/database.js";
+import { initSocket } from "./src/sockets/index.js";
 
 const startServer = async () => {
   try {
     await connectDB();
 
     const httpServer = createServer(app);
-
-    // Attach Socket.io to HTTP server
     initSocket(httpServer);
 
-    httpServer.listen(PORT, () => {
-      console.log(`✓ UNISALE backend listening on port ${PORT}`);
-      console.log(`✓ Environment: ${process.env.NODE_ENV || "development"}`);
+    httpServer.listen(config.port, () => {
+      console.log(`[api] UniSale backend listening on port ${config.port}`);
+      console.log(`[api] environment: ${config.env}`);
+      console.log(`[api] docs: http://localhost:${config.port}/api/docs`);
     });
 
-    // Graceful shutdown
-    const shutdown = async (signal) => {
+    const shutdown = (signal) => {
       console.log(`\n${signal} received. Shutting down gracefully...`);
       httpServer.close(() => {
         console.log("HTTP server closed.");
@@ -30,7 +27,7 @@ const startServer = async () => {
       setTimeout(() => {
         console.error("Forced shutdown after timeout.");
         process.exit(1);
-      }, 10000);
+      }, 10_000).unref();
     };
 
     process.on("SIGTERM", () => shutdown("SIGTERM"));
@@ -42,12 +39,12 @@ const startServer = async () => {
 };
 
 process.on("unhandledRejection", (error) => {
-  console.error("Unhandled promise rejection:", error.message);
+  console.error("Unhandled promise rejection:", error?.message || error);
   process.exit(1);
 });
 
 process.on("uncaughtException", (error) => {
-  console.error("Uncaught exception:", error.message);
+  console.error("Uncaught exception:", error?.message || error);
   process.exit(1);
 });
 

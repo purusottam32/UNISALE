@@ -55,6 +55,11 @@ const issueTokens = async (user, res) => {
   return { accessToken, refreshToken };
 };
 
+/**
+ * The shape of the signed-in user returned to the client. This is the *own*
+ * user view — it includes the email and role that `toPublicProfile` in
+ * user.service.js deliberately withholds from other students.
+ */
 const toPublicUser = (user) => ({
   id: user._id,
   name: user.name,
@@ -65,9 +70,17 @@ const toPublicUser = (user) => ({
   department: user.department || "",
   year: user.year || null,
   bio: user.bio || "",
+  interests: user.interests || [],
   role: user.role,
+  ratingAverage: user.ratingAverage || 0,
+  ratingCount: user.ratingCount || 0,
+  completedDeals: user.completedDeals || 0,
   isEmailVerified: user.isEmailVerified,
   isProfileComplete: user.isProfileComplete,
+  isIdVerified: user.isIdVerified,
+  trustScore: user.trustScore,
+  trustTier: user.trustTier,
+  notificationPrefs: user.notificationPrefs,
   createdAt: user.createdAt,
 });
 
@@ -264,7 +277,10 @@ export const googleAuthService = async ({ googleId, email, name, avatarUrl }, re
 /**
  * Complete profile after email verification.
  */
-export const completeProfileService = async (userId, { username, college, department, year, bio, avatarFile }) => {
+export const completeProfileService = async (
+  userId,
+  { username, college, department, year, bio, interests, avatarFile }
+) => {
   const user = await User.findById(userId);
   if (!user) throw new AppError("User not found.", 404);
 
@@ -279,6 +295,8 @@ export const completeProfileService = async (userId, { username, college, depart
   user.department = department;
   user.year = year;
   if (bio !== undefined) user.bio = bio;
+  // Seeds feed personalisation on day one, before any behavioural signal exists.
+  if (Array.isArray(interests)) user.interests = interests.slice(0, 6);
 
   if (avatarFile?.buffer) {
     const { url, key } = await uploadImageToR2(avatarFile.buffer, "avatars");
@@ -308,13 +326,14 @@ export const updateMeService = async (userId, updates, avatarFile) => {
   const user = await User.findById(userId);
   if (!user) throw new AppError("User not found.", 404);
 
-  const { college, department, year, bio, name } = updates;
+  const { college, department, year, bio, name, interests } = updates;
 
   if (name !== undefined) user.name = name;
   if (college !== undefined) user.college = college;
   if (department !== undefined) user.department = department;
   if (year !== undefined) user.year = year;
   if (bio !== undefined) user.bio = bio;
+  if (Array.isArray(interests)) user.interests = interests.slice(0, 6);
 
   if (avatarFile?.buffer) {
     const { url, key } = await uploadImageToR2(avatarFile.buffer, "avatars");

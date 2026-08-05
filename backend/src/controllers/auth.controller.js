@@ -13,6 +13,7 @@ import {
 } from "../services/auth.service.js";
 import { getGoogleAuthUrl, exchangeCodeForGoogleUser } from "../utils/googleOAuth.js";
 import AppError from "../utils/apiError.js";
+import config from "../config/index.js";
 
 // POST /api/auth/register
 export const register = asyncHandler(async (req, res) => {
@@ -70,9 +71,9 @@ export const googleCallback = asyncHandler(async (req, res) => {
   const googleUser = await exchangeCodeForGoogleUser(code);
   const result = await googleAuthService(googleUser, res);
 
-  const redirectBase = process.env.CLIENT_URL || "http://localhost:5173";
-  const destination = result.isNewUser ? "/complete-profile" : "/feed";
-  res.redirect(`${redirectBase}${destination}?token=${result.accessToken}`);
+  // CLIENT_URL may hold several origins; the first is the canonical web app.
+  const destination = result.isNewUser ? "/onboarding" : "/feed";
+  res.redirect(`${config.primaryClientOrigin}${destination}?token=${result.accessToken}`);
 });
 
 // GET /api/auth/me
@@ -89,6 +90,7 @@ export const updateMe = asyncHandler(async (req, res) => {
 
 // POST /api/auth/complete-profile
 export const completeProfile = asyncHandler(async (req, res) => {
-  const user = await completeProfileService(req.user._id, req.body, req.file);
+  // The service takes a single options object — the avatar must be folded in.
+  const user = await completeProfileService(req.user._id, { ...req.body, avatarFile: req.file });
   res.status(200).json({ success: true, data: user });
 });

@@ -1,5 +1,5 @@
-import Landing from "@/screens/Landing";
+import LandingScreen from "@/features/marketing/LandingScreen";
 
 export default function HomePage() {
-  return <Landing />;
+  return <LandingScreen />;
 }
