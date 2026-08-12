@@ -1,3 +1,9 @@
+# Dependencies
+node_modules
+.pnpm-store
+.yarn/cache
+.yarn/install-state.gz
+
 # Logs
 logs
 *.log
@@ -7,21 +13,61 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+# Build output
+.next
+out
 dist
 dist-ssr
+build
+.turbo
 *.local
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing / coverage
+coverage
+.nyc_output
+
+# Environment files (keep .env.sample / .env.example committed)
+.env
+.env.*
+!.env.sample
+!.env.example
+
+# Certificates & keys
+*.pem
+*.key
+
+# Deployment
+.vercel
+
+# Caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# Python bytecode (from tooling/scripts)
+__pycache__/
+*.py[cod]
+
+# Claude Code local files
+.claude/
+CLAUDE.local.md
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-.env
-.next
-.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
