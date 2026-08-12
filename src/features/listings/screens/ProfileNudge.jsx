@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CloseIcon } from "@/components/ui/icons";
+import { Sparkles } from "lucide-react";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 
 const DISMISS_KEY = "unisale.nudge.profile";
 
@@ -26,9 +28,7 @@ export default function ProfileNudge({ user }) {
 
   return (
     <div className="relative flex flex-wrap items-center gap-3 rounded-lg border border-line bg-brand-tint p-4">
-      <span className="text-xl" aria-hidden>
-        ✨
-      </span>
+      <Sparkles size={iconSize.lg} strokeWidth={ICON_STROKE} aria-hidden className="text-brand" />
 
       <p className="min-w-0 flex-1 text-sm text-ink-2">
         <span className="font-semibold text-ink">Add {missing}.</span> Buyers message profiles

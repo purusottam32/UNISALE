@@ -13,12 +13,14 @@ import {
 import { useAuth } from "@/features/auth/auth-context";
 import { formatPrice, getDiscountPercent } from "@/lib/format";
 import { applyFieldErrors, getErrorMessage } from "@/lib/errors";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { ChoiceGroup, Input, Textarea } from "@/components/ui/Field";
 import Chip from "@/components/ui/Chip";
-import { cn } from "@/components/ui/cn";
+import { cn } from "@/lib/cn";
 import { CheckIcon, ChevronLeftIcon } from "@/components/ui/icons";
+import { ImageOff } from "lucide-react";
 import { useCreateListing } from "../hooks";
 import PhotoUploader from "../components/PhotoUploader";
 
@@ -211,16 +213,21 @@ export default function SellScreen() {
                 Category <span className="text-danger">*</span>
               </p>
               <div className="flex flex-wrap gap-2">
-                {LISTING_CATEGORIES.map((category) => (
-                  <Chip
-                    key={category}
-                    active={form.category === category}
-                    onClick={() => set({ category })}
-                  >
-                    <span aria-hidden>{CATEGORY_META[category]?.emoji}</span>
-                    {category}
-                  </Chip>
-                ))}
+                {LISTING_CATEGORIES.map((category) => {
+                  const CategoryIcon = CATEGORY_META[category].Icon;
+                  return (
+                    <Chip
+                      key={category}
+                      active={form.category === category}
+                      icon={
+                        <CategoryIcon size={iconSize.xs} strokeWidth={ICON_STROKE} aria-hidden />
+                      }
+                      onClick={() => set({ category })}
+                    >
+                      {category}
+                    </Chip>
+                  );
+                })}
               </div>
               {errors.category && (
                 <p className="mt-1.5 text-xs font-medium text-danger">{errors.category}</p>
@@ -385,7 +392,9 @@ function PreviewCard({ form, photos, user }) {
           // and these previews never leave the browser.
           <img src={photos[0].preview} alt="" className="h-full w-full object-cover" />
         ) : (
-          <div className="grid h-full place-items-center text-3xl text-muted">📦</div>
+          <div className="grid h-full place-items-center text-faint">
+            <ImageOff size={iconSize["2xl"]} strokeWidth={ICON_STROKE} aria-hidden />
+          </div>
         )}
         {condition && (
           <span className="absolute left-2 top-2">

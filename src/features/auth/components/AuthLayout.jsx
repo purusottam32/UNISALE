@@ -29,7 +29,7 @@ export default function AuthLayout({ title, subtitle, children, footer, step }) 
         <main className="mx-auto flex w-full max-w-[420px] flex-1 flex-col justify-center py-10">
           {step && <StepDots current={step.current} total={step.total} labels={step.labels} />}
 
-          <h1 className="text-[28px] font-extrabold leading-tight tracking-[-0.02em] text-ink">
+          <h1 className="text-display-md text-ink">
             {title}
           </h1>
           {subtitle && <p className="mt-2 text-[15px] leading-relaxed text-muted">{subtitle}</p>}
@@ -47,10 +47,10 @@ export default function AuthLayout({ title, subtitle, children, footer, step }) 
         />
 
         <div className="relative">
-          <p className="text-[13px] font-semibold uppercase tracking-[0.14em] text-brand">
+          <p className="text-micro uppercase text-brand">
             Campus-only marketplace
           </p>
-          <h2 className="mt-3 text-[34px] font-extrabold leading-[1.15] tracking-[-0.02em] text-ink">
+          <h2 className="mt-4 text-display-lg text-ink">
             Every semester, a small economy moves through your campus.
           </h2>
           <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-ink-2">

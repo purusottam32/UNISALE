@@ -1,15 +1,27 @@
 import Link from "next/link";
-import { cn } from "@/components/ui/cn";
+import { cn } from "@/lib/cn";
 
-/** Wordmark. The tag shape nods to a price label without needing an asset. */
+/**
+ * Wordmark. The tag shape nods to a price label without needing an asset.
+ *
+ * The mark carries the brand colour and the word does not. "Uni" in ink with
+ * "Sale" in indigo is a two-tone trick that reads as a startup logo generator,
+ * and it also spends the accent on something that is not an action — the one
+ * rule the colour system asks components to keep. One indigo object in the
+ * top-left corner is a brand; two is decoration.
+ */
 export default function Logo({ href = "/", size = "md", className = "" }) {
-  const scale = size === "lg" ? "text-2xl" : "text-[19px]";
+  const scale = size === "lg" ? "text-headline" : "text-title";
 
   return (
-    <Link href={href} className={cn("inline-flex items-center gap-2", className)} aria-label="UniSale home">
+    <Link
+      href={href}
+      className={cn("inline-flex items-center gap-2", className)}
+      aria-label="UniSale home"
+    >
       <span
         aria-hidden
-        className="grid h-8 w-8 place-items-center rounded-[10px] bg-brand text-brand-fg"
+        className="grid h-8 w-8 place-items-center rounded-sm bg-brand text-brand-fg"
       >
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden>
           <path
@@ -21,9 +33,7 @@ export default function Logo({ href = "/", size = "md", className = "" }) {
           <circle cx="7.9" cy="7.9" r="1.5" fill="currentColor" />
         </svg>
       </span>
-      <span className={cn("font-extrabold tracking-[-0.02em] text-ink", scale)}>
-        Uni<span className="text-brand">Sale</span>
-      </span>
+      <span className={cn("text-ink", scale)}>UniSale</span>
     </Link>
   );
 }

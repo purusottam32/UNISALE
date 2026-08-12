@@ -8,15 +8,15 @@ import SearchBar from "@/features/search/SearchBar";
 import FilterBar from "../components/FilterBar";
 import FilterPanel from "../components/FilterPanel";
 import ListingGrid from "../components/ListingGrid";
+import { Search, SearchX } from "lucide-react";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 
 export default function SearchScreen() {
   const { filters, setFilters, query, apiParams } = useListingFilters();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const { listings, totalItems, isLoading, hasMore, loadMore, isFetchingMore } = useListings(
-    apiParams,
-    { enabled: Boolean(query) }
-  );
+  const { listings, totalItems, isLoading, hasMore, loadMore, isFetchingMore, error, refetch } =
+    useListings(apiParams, { enabled: Boolean(query) });
 
   return (
     <div className="space-y-5">
@@ -30,7 +30,7 @@ export default function SearchScreen() {
         </header>
       ) : (
         <EmptyState
-          glyph="🔎"
+          icon={<Search size={iconSize.xl} strokeWidth={ICON_STROKE} />}
           title="What are you after?"
           description="Search for cycles, calculators, textbooks, hostel kit — anything students trade."
           action={{ label: "Browse everything", href: "/explore" }}
@@ -53,9 +53,11 @@ export default function SearchScreen() {
             hasMore={hasMore}
             onLoadMore={loadMore}
             isFetchingMore={isFetchingMore}
+            error={error}
+            onRetry={refetch}
             emptyState={
               <EmptyState
-                glyph="🤷"
+                icon={<SearchX size={iconSize.xl} strokeWidth={ICON_STROKE} />}
                 title={`No results for “${query}”`}
                 description={
                   filters.allColleges

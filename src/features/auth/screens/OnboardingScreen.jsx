@@ -6,10 +6,11 @@ import toast from "react-hot-toast";
 import { CATEGORY_META, LISTING_CATEGORIES } from "@/config/catalog";
 import { compressImage } from "@/lib/compress-image";
 import { getErrorMessage } from "@/lib/errors";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import { Input, Select, Textarea } from "@/components/ui/Field";
-import { cn } from "@/components/ui/cn";
+import { cn } from "@/lib/cn";
 import { CameraIcon, CheckIcon } from "@/components/ui/icons";
 import { useAuth } from "../auth-context";
 import AuthLayout from "../components/AuthLayout";
@@ -150,6 +151,7 @@ export default function OnboardingScreen() {
             {LISTING_CATEGORIES.map((category) => {
               const selected = interests.includes(category);
               const atLimit = interests.length >= MAX_INTERESTS && !selected;
+              const CategoryIcon = CATEGORY_META[category].Icon;
 
               return (
                 <button
@@ -166,9 +168,12 @@ export default function OnboardingScreen() {
                     atLimit && "cursor-not-allowed opacity-45"
                   )}
                 >
-                  <span className="text-xl" aria-hidden>
-                    {CATEGORY_META[category]?.emoji}
-                  </span>
+                  <CategoryIcon
+                    size={iconSize.lg}
+                    strokeWidth={ICON_STROKE}
+                    aria-hidden
+                    className={selected ? "text-brand" : "text-muted"}
+                  />
                   <span
                     className={cn(
                       "mt-1.5 block text-[13px] font-semibold leading-tight",

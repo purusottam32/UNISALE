@@ -1,6 +1,21 @@
+import {
+  Armchair,
+  BedDouble,
+  Bike,
+  BookOpen,
+  Headphones,
+  Laptop,
+  Package,
+  PenLine,
+  Shirt,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
+
 /**
  * Listing vocabulary. Mirrors `backend/src/config/constants.js` — change one,
- * change the other.
+ * change the other. Note the icons below are presentation only and have no
+ * backend counterpart, so they are not part of that contract.
  *
  * Everything is `as const` so category names are a union type rather than
  * `string`, which is what lets `CATEGORY_META[category]` type-check and stops
@@ -22,18 +37,26 @@ export const LISTING_CATEGORIES = [
 
 export type ListingCategory = (typeof LISTING_CATEGORIES)[number];
 
-/** Display metadata for the category rail and the sell wizard picker. */
-export const CATEGORY_META: Record<ListingCategory, { emoji: string; blurb: string }> = {
-  Electronics: { emoji: "💻", blurb: "Laptops, phones, cameras" },
-  "Books & Notes": { emoji: "📚", blurb: "Textbooks, notes, guides" },
-  Furniture: { emoji: "🪑", blurb: "Tables, chairs, shelves" },
-  "Hostel Essentials": { emoji: "🛏️", blurb: "Bedding, kettles, storage" },
-  Fashion: { emoji: "👕", blurb: "Clothing, shoes, bags" },
-  "Sports & Fitness": { emoji: "🚲", blurb: "Cycles, gear, gym kit" },
-  "Stationery & Supplies": { emoji: "✏️", blurb: "Drafters, calculators, art" },
-  "Gadgets & Accessories": { emoji: "🎧", blurb: "Earphones, chargers, cables" },
-  Services: { emoji: "🛠️", blurb: "Tutoring, design, repairs" },
-  Other: { emoji: "📦", blurb: "Everything else" },
+/**
+ * Display metadata for the category rail and the sell wizard picker.
+ *
+ * Icons are Lucide components, not emoji. Emoji render in the platform's own
+ * typeface at the platform's own weight, so a category rail built from them
+ * agrees with nothing else on screen — and ten of them in a row is the single
+ * loudest thing on the page. A stroked icon at `ICON_STROKE` sits at the same
+ * weight as the type beside it, which is the entire point.
+ */
+export const CATEGORY_META: Record<ListingCategory, { Icon: LucideIcon; blurb: string }> = {
+  Electronics: { Icon: Laptop, blurb: "Laptops, phones, cameras" },
+  "Books & Notes": { Icon: BookOpen, blurb: "Textbooks, notes, guides" },
+  Furniture: { Icon: Armchair, blurb: "Tables, chairs, shelves" },
+  "Hostel Essentials": { Icon: BedDouble, blurb: "Bedding, kettles, storage" },
+  Fashion: { Icon: Shirt, blurb: "Clothing, shoes, bags" },
+  "Sports & Fitness": { Icon: Bike, blurb: "Cycles, gear, gym kit" },
+  "Stationery & Supplies": { Icon: PenLine, blurb: "Drafters, calculators, art" },
+  "Gadgets & Accessories": { Icon: Headphones, blurb: "Earphones, chargers, cables" },
+  Services: { Icon: Wrench, blurb: "Tutoring, design, repairs" },
+  Other: { Icon: Package, blurb: "Everything else" },
 };
 
 export interface CatalogOption<T extends string = string> {

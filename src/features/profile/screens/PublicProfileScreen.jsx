@@ -20,6 +20,8 @@ import { RatingStars } from "@/components/ui/Rating";
 import { ChevronLeftIcon, FlagIcon } from "@/components/ui/icons";
 import { usePublicProfile, useReportUser, useUserReviews } from "../hooks";
 import ReviewList from "../components/ReviewList";
+import { FilterX, Ghost } from "lucide-react";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 
 /** Another student's storefront: what they're selling and whether to trust them. */
 export default function PublicProfileScreen({ userId }) {
@@ -46,7 +48,7 @@ export default function PublicProfileScreen({ userId }) {
   if (error || !profile) {
     return (
       <EmptyState
-        glyph="👻"
+        icon={<Ghost size={iconSize.xl} strokeWidth={ICON_STROKE} />}
         title="Profile not found"
         description={error || "This student may have left UniSale."}
         action={{ label: "Back to explore", href: "/explore" }}
@@ -149,7 +151,7 @@ export default function PublicProfileScreen({ userId }) {
           isLoading={listingsLoading}
           emptyState={
             <EmptyState
-              glyph="🫙"
+              icon={<FilterX size={iconSize.xl} strokeWidth={ICON_STROKE} />}
               title={`${profile.name.split(" ")[0]} has nothing listed right now`}
               description="Check back later, or message them about something specific."
             />

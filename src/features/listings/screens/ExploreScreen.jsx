@@ -7,12 +7,14 @@ import { EmptyState } from "@/components/ui/States";
 import FilterBar from "../components/FilterBar";
 import FilterPanel from "../components/FilterPanel";
 import ListingGrid from "../components/ListingGrid";
+import { FilterX } from "lucide-react";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 
 export default function ExploreScreen() {
   const { filters, setFilters, apiParams } = useListingFilters();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const { listings, totalItems, isLoading, hasMore, loadMore, isFetchingMore } =
+  const { listings, totalItems, isLoading, hasMore, loadMore, isFetchingMore, error, refetch } =
     useListings(apiParams);
 
   return (
@@ -38,9 +40,11 @@ export default function ExploreScreen() {
         hasMore={hasMore}
         onLoadMore={loadMore}
         isFetchingMore={isFetchingMore}
+        error={error}
+        onRetry={refetch}
         emptyState={
           <EmptyState
-            glyph="🫙"
+            icon={<FilterX size={iconSize.xl} strokeWidth={ICON_STROKE} />}
             title="Nothing matches those filters"
             description={
               filters.allColleges

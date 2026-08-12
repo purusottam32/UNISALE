@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertTriangle, RefreshCw, WifiOff } from "lucide-react";
+import { AlertTriangle, RefreshCw, Search, WifiOff } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 import { fadeUp } from "@/lib/motion";
@@ -20,8 +20,17 @@ import Spinner from "./Spinner";
 /* ── Empty ────────────────────────────────────────────────────────────────*/
 
 export interface EmptyStateProps {
-  /** A single emoji. Illustrations get stale and cost a download. */
-  glyph?: string;
+  /**
+   * A Lucide icon element, e.g. `<Search size={iconSize.xl} />`. Defaults to a
+   * magnifier.
+   *
+   * This used to take an emoji, on the reasoning that illustrations get stale
+   * and cost a download — true, but the alternative to an illustration is an
+   * icon, not a glyph from the OS emoji font. An emoji cannot inherit
+   * `currentColor`, ignores the stroke weight of everything around it, and
+   * renders as a different picture on every platform.
+   */
+  icon?: React.ReactNode;
   title: string;
   description?: string;
   action?: { label: string; href?: string; onClick?: () => void };
@@ -37,7 +46,7 @@ export interface EmptyStateProps {
  * something. A dead end here is a churned user.
  */
 export function EmptyState({
-  glyph = "🔍",
+  icon,
   title,
   description,
   action,
@@ -58,8 +67,13 @@ export function EmptyState({
         className
       )}
     >
-      <span aria-hidden className="mb-4 text-[2.5rem] leading-none">
-        {glyph}
+      {/* Same framed circle `ErrorState` uses below, so the two states finally
+          look like siblings instead of a 40px glyph next to a 48px disc. */}
+      <span
+        aria-hidden
+        className="mb-4 grid h-12 w-12 place-items-center rounded-full bg-surface-2 text-muted"
+      >
+        {icon ?? <Search size={iconSize.xl} strokeWidth={ICON_STROKE} />}
       </span>
 
       <h3 className="text-title text-ink">{title}</h3>

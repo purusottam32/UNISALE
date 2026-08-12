@@ -41,10 +41,15 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b100e" },
-  ],
+  /**
+   * One value, matching `--color-canvas`. A media-split would be wrong here:
+   * the theme is dark for everyone by default regardless of OS preference,
+   * and `themeColor` cannot read the localStorage flag that overrides it. So
+   * a user who explicitly chose light gets dark browser chrome — the only
+   * honest option, since the alternative is chrome that contradicts the page
+   * for the majority instead of the minority.
+   */
+  themeColor: "#090909",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

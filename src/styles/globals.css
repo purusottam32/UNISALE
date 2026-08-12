@@ -8,27 +8,42 @@
 
    Rationale for each decision: docs/DESIGN-LANGUAGE.md
 
-   HOW THIS WORKS
+   HOW THIS WORKS — DARK FIRST
    `@theme` declares design tokens; Tailwind v4 emits utilities that
-   *reference* the resulting CSS variables. Re-pointing a `--color-*` inside
-   the dark blocks therefore re-themes every `bg-surface` / `text-ink` /
-   `border-line` in the app at once — which is why there is not a single
-   `dark:` variant in any component.
+   *reference* the resulting CSS variables. `@theme` carries the DARK values,
+   so dark is what you get with no attribute set — including for a
+   first-time visitor whose OS is in light mode. Light is an explicit
+   opt-in, declared exactly once in `:root[data-theme="light"]`.
 
-   THE FOUR RULES
+   That block sits outside any `@layer`, and unlayered rules beat layered
+   ones regardless of specificity, so it overrides `@theme` unconditionally.
+
+   `data-theme` is single-purpose: a light-override flag. Dark is the
+   *absence* of the attribute. There is no `[data-theme="dark"]` selector and
+   no `prefers-color-scheme` block — the three-state toggle resolves
+   "system" in JS, before first paint, in `ThemeScript`. Keeping resolution
+   in JS is what lets each palette be written once instead of twice.
+
+   Consequence worth knowing: with no JS, you get dark. Always.
+
+   THE FIVE RULES
    1. No hardcoded values in components. If you need a number, add a token.
    2. Anything `brand`-coloured is an action. If it is not clickable, it is
-      a bug.
+      a bug. This includes text.
    3. Light mode gets shadows; dark mode gets a surface ladder. Never both.
    4. Type tracking is baked into the `--text-*` tokens. Never set
       `letter-spacing` by hand.
+   5. A box outline is `shadow-e1`, never `border`. `--color-line` is for
+      separators only — hairlines under chrome, `divide-y`, table rules.
+      See the note on `--color-line` below.
    ══════════════════════════════════════════════════════════════════════════ */
 
 @theme {
-  /* ── Brand · Indigo ──────────────────────────────────────────────────────
-     The premium cohort is unanimously indigo-violet (Linear #5e6ad2, Stripe
-     #533afd, Notion #5645d4, Revolut #494fdf). We sit in that band and spend
-     it sparingly — accent as flashlight, not paint. */
+  /* ── Brand ramp · Indigo ─────────────────────────────────────────────────
+     Theme-independent. The premium cohort is unanimously indigo-violet
+     (Linear #5e6ad2, Stripe #533afd, Notion #5645d4, Revolut #494fdf). We sit
+     in that band and spend it sparingly — accent as flashlight, not paint.
+     Components use the semantic aliases below, never the numbered ramp. */
   --color-brand-50: #eef0ff;
   --color-brand-100: #e0e4ff;
   --color-brand-200: #c7cdfe;
@@ -40,55 +55,94 @@
   --color-brand-800: #3730a3;
   --color-brand-900: #312e81;
 
-  /* Semantic brand aliases — components use these, never the numbered ramp. */
-  --color-brand: #4f46e5;        /* 6.29:1 on white · 6.02:1 on canvas */
-  --color-brand-hover: #4740d4;
-  --color-brand-active: #4338ca; /* 7.90:1 */
-  --color-brand-fg: #ffffff;
-  --color-brand-tint: #eef0ff;
-  --color-brand-tint-hover: #e0e4ff;
-  --color-brand-ring: rgba(79, 70, 229, 0.28);
+  /* ══ DARK SEMANTIC PALETTE ═══════════════════════════════════════════════
+     The default. Light overrides live in `:root[data-theme="light"]`, in the
+     same order — keep the two lists aligned so a missing token is visible in
+     a diff. A token declared in only one block silently inherits the other
+     theme's value, which is the failure mode to watch for. */
 
-  /* ── Accent · Emerald ────────────────────────────────────────────────────
-     Trust, verification, price drops. NOTE the light-mode value is 700, not
-     the obvious 500 — #10B981 measures 3.61:1 and fails AA as text. */
-  --color-accent: #047857;       /* 5.25:1 on canvas */
-  --color-accent-hover: #036249;
-  --color-accent-fg: #ffffff;    /* 5.48:1 on accent */
-  --color-accent-tint: #ecfdf5;
-  --color-accent-vivid: #10b981; /* large glyphs / illustration only */
+  /* Brand. The 400 step, not the 600: on near-black, 600 measures under 3:1. */
+  --color-brand: #818cf8;        /* 6.67:1 on canvas */
+  --color-brand-hover: #a5b4fc;
+  --color-brand-active: #c7cdfe;
+  --color-brand-fg: #090909;     /* 6.67:1 — the button inverts in dark */
+  --color-brand-tint: rgba(129, 140, 248, 0.14);
+  --color-brand-tint-hover: rgba(129, 140, 248, 0.22);
+  --color-brand-ring: rgba(129, 140, 248, 0.34);
+
+  /* Accent · Emerald. Verification, and nothing else.
+     At 10.36:1 this is the brightest thing available in a near-monochrome
+     dark UI, so it buys attention at a price. It means "verified student".
+     It does not mean "discount", "success toast" or "nice number". */
+  --color-accent: #34d399;       /* 10.36:1 */
+  --color-accent-hover: #6ee7b7;
+  --color-accent-fg: #090909;
+  --color-accent-tint: rgba(52, 211, 153, 0.14);
+  --color-accent-vivid: #34d399;
 
   /* ── Surfaces ────────────────────────────────────────────────────────────
-     Furthest back to nearest the user. */
-  --color-canvas: #fafafa;
-  --color-surface: #ffffff;
-  --color-surface-2: #f1f5f9;
-  --color-surface-3: #e2e8f0;
+     Furthest back to nearest the user. Fully achromatic (r === g === b) —
+     the near-monochrome direction lives here, not in the accent.
+
+     Premium dark is near-black, not Material's #121212 grey as a *canvas*
+     (Linear #08090a, Raycast #07080a, Framer #090909 all land at the top).
+
+     The ladder is deliberately wider than a straight neutralisation would
+     give: canvas→surface-3 spans 1.283 rather than 1.219. In dark mode this
+     ladder IS the elevation system, and steps too small to separate anything
+     are exactly why so much of this app used to reach for a border. */
+  --color-canvas: #090909;
+  --color-surface: #121212;   /* 1.063 above canvas */
+  --color-surface-2: #1a1a1a; /* 1.076 */
+  --color-surface-3: #242424; /* 1.121 */
 
   /* ── Lines ───────────────────────────────────────────────────────────────
-     `line` is decorative; `line-strong` carries meaning (input borders). */
-  --color-line: #e7e7ea;
-  --color-line-strong: #cbd5e1;
+     SEPARATORS ONLY. `line` draws a rule *between* things — a hairline under
+     sticky chrome, `divide-y` on a list, a rule between table rows. It does
+     NOT outline a box; a box gets `shadow-e1`, which costs no layout and
+     resolves correctly in both themes (rule 5).
+
+     `line-strong` carries meaning: input borders, where the edge of the
+     control is genuinely information. */
+  --color-line: rgba(255, 255, 255, 0.055);
+  --color-line-strong: rgba(255, 255, 255, 0.12);
 
   /* ── Text ────────────────────────────────────────────────────────────────
-     Slate-tinted so neutrals harmonise with indigo rather than fight it. */
-  --color-ink: #18181b;   /* 16.97:1 — headings, prices */
-  --color-ink-2: #3f3f46; /* 10.01:1 — body copy */
-  --color-muted: #64748b; /*  4.56:1 — metadata. Do NOT lighten. */
-  --color-faint: #94a3b8; /*  2.46:1 — decorative + disabled ONLY */
-  --color-inverse: #ffffff;
+     Achromatic, matching the surfaces. The slate cast the ink ramp used to
+     carry is most of what read as "blue-grey theme" rather than editorial —
+     mid-grey text shows chroma that a 3%-luminance surface can hide. */
+  --color-ink: #f5f5f5;   /* 18.26:1 — headings, prices. Not #fff: pure
+                             white on near-black haloes on OLED. */
+  --color-ink-2: #c9c9c9; /* 12.02:1 — body copy */
+  --color-muted: #919191; /*  6.32:1 on canvas · 4.93:1 on surface-3.
+                             That second figure is the binding constraint on
+                             the whole ladder. Do NOT darken this, and do not
+                             lighten surface-3 past #262626 (which drops it
+                             to 4.79) without re-measuring. */
+  --color-faint: #606060; /*  3.17:1 — clears the 3:1 large-text floor, so
+                             this is legitimately usable for display-size
+                             marks (the landing page sets 40px step numerals
+                             in it) as well as for disabled and decorative. */
+  --color-inverse: #090909;
 
   /* ── Semantic ────────────────────────────────────────────────────────────*/
-  --color-success: #047857;
-  --color-success-tint: #ecfdf5;
-  --color-warn: #b45309;
-  --color-warn-tint: #fffbeb;
-  --color-danger: #be123c;
+  --color-success: #34d399;
+  --color-success-tint: rgba(52, 211, 153, 0.14);
+  --color-warn: #fbbf24;
+  --color-warn-tint: rgba(251, 191, 36, 0.14);
+  --color-danger: #fb7185;
+  /* Theme-independent, and deliberately so: the unread counters ride this
+     fill in both themes, which is why they can hardcode white text (4.71:1)
+     instead of routing through a token that has to flip. */
   --color-danger-fill: #e11d48;
-  --color-danger-tint: #fff1f2;
-  --color-danger-fg: #ffffff;
-  --color-info: #4338ca;
-  --color-info-tint: #eef0ff;
+  --color-danger-tint: rgba(251, 113, 133, 0.14);
+  /* Near-black in dark, and this is a fix, not a preference: `danger` lightens
+     to #fb7185 here, so the inherited white gave `bg-danger text-danger-fg`
+     — the solid destructive button — a measured 2.69:1. It inverts for the
+     same reason brand-fg and accent-fg do. */
+  --color-danger-fg: #090909; /* 7.35:1 on danger */
+  --color-info: #a5b4fc;
+  --color-info-tint: rgba(165, 180, 252, 0.14);
 
   /* ══ TYPOGRAPHY ══════════════════════════════════════════════════════════
      Inter Variable. Tracking runs −0.04em at display sizes and eases to 0 by
@@ -163,6 +217,15 @@
   --text-micro--letter-spacing: 0.06em;
   --text-micro--font-weight: 600;
 
+  /* The floor. Tab-bar labels and the unread counters that sit on an icon —
+     the two places where 11px genuinely will not fit. Anything smaller than
+     this is not small type, it is illegible type: the counters this replaces
+     were 9px at weight 700, which is both unreadable and over the ceiling. */
+  --text-nano: 0.625rem; /* 10 */
+  --text-nano--line-height: 1.2;
+  --text-nano--letter-spacing: 0.01em;
+  --text-nano--font-weight: 600;
+
   --text-button: 0.9375rem; /* 15 */
   --text-button--line-height: 1;
   --text-button--letter-spacing: -0.008em;
@@ -209,17 +272,24 @@
   --radius-full: 9999px;
 
   /* ══ ELEVATION ═══════════════════════════════════════════════════════════
-     Stacked micro-offsets + an inset hairline. Several tiny shadows read as
-     *light*; one big blur reads as Material Design. Light mode only —
-     dark mode climbs the surface ladder instead (see below). */
-  --shadow-e1: inset 0 0 0 1px rgba(15, 23, 42, 0.05),
-    0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-e2: inset 0 0 0 1px rgba(15, 23, 42, 0.05),
-    0 2px 4px rgba(15, 23, 42, 0.04), 0 8px 16px -6px rgba(15, 23, 42, 0.06);
-  --shadow-e3: inset 0 0 0 1px rgba(15, 23, 42, 0.06),
-    0 4px 8px rgba(15, 23, 42, 0.04), 0 16px 32px -8px rgba(15, 23, 42, 0.1);
-  --shadow-e4: inset 0 0 0 1px rgba(15, 23, 42, 0.06),
-    0 24px 48px -12px rgba(15, 23, 42, 0.18);
+     Indirected through `--elev-*` ON PURPOSE. Do not inline the shadow
+     values here.
+
+     Tailwind v4 treats `--shadow-*` tokens as build-time constants: it parses
+     the value so it can splice in `--tw-shadow-color`, and bakes the result
+     into `.shadow-e2` itself rather than emitting `var(--shadow-e2)`. Colour
+     tokens are emitted as `var(--color-*)` and so re-theme at runtime;
+     shadows do not. Redeclaring `--shadow-e2` per theme therefore has no
+     effect whatsoever — which is exactly the trap the previous version of
+     this file fell into, silently shipping light-mode shadows to dark mode.
+
+     Pointing each token at a plain custom property restores runtime
+     switching: the utility inlines `var(--elev-2)`, which resolves per theme.
+     Every `shadow-e*` class in the app keeps working untouched. */
+  --shadow-e1: var(--elev-1);
+  --shadow-e2: var(--elev-2);
+  --shadow-e3: var(--elev-3);
+  --shadow-e4: var(--elev-4);
 
   /* ══ ANIMATION ═══════════════════════════════════════════════════════════
      Named animations for surfaces Radix mounts and unmounts directly
@@ -239,13 +309,16 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   RUNTIME TOKENS
+   RUNTIME TOKENS · dark
    Values Tailwind does not generate utilities for: motion, z-index, chrome
-   geometry, overlays. Mirrored in `src/lib/design-tokens.ts` for JS.
+   geometry, overlays. Mirrored in `src/lib/design-tokens.ts` for JS — motion
+   and geometry only. Colour never goes in that file.
    ══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  color-scheme: light;
+  /* Declared in the stylesheet, not applied by JS, so the very first paint
+     has the right native form controls, scrollbars and autofill. */
+  color-scheme: dark;
 
   /* ── Motion ──────────────────────────────────────────────────────────────
      Durations from the 150–300ms consensus; anything under 80ms reads as
@@ -286,214 +359,233 @@
   --z-modal: 70;
   --z-toast: 90;
 
-  /* ── Overlays ────────────────────────────────────────────────────────────*/
+  /* ── Elevation · dark ────────────────────────────────────────────────────
+     On near-black a drop shadow is invisible, so elevation is mostly a
+     hairline plus a climb up the surface ladder. These are also what a box
+     outline resolves to (rule 5) — `shadow-e1` instead of `border` costs no
+     layout, which is why nested cards used to misalign by a pixel.
+
+     `e2` is the exception, and the one deliberate break from "inset only":
+     it is what ProductCard's hover promises, and an inset hairline drawn
+     inside a photograph's own edge cannot be seen. So e2 puts a faint halo
+     *around* the lifted element — which is what "picked up off the page"
+     actually looks like on a dark ground. */
+  --elev-1: inset 0 0 0 1px rgba(255, 255, 255, 0.055);
+  --elev-2: 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 16px 32px -16px rgba(0, 0, 0, 1);
+  --elev-3: inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 16px 32px -12px rgba(0, 0, 0, 0.75);
+  --elev-4: inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 32px 64px -16px rgba(0, 0, 0, 0.85);
+
+  /* ── Overlays ────────────────────────────────────────────────────────────
+     `--glass` derives from CANVAS, not surface. Sticky chrome sits over
+     content that scrolls beneath it and should recede below that content,
+     not float above it as a lighter plate.
+
+     Saturation is 140%, not 180%: on near-black, over-saturating amplifies
+     whatever bleeds through, and a listing photograph passing under the top
+     bar becomes a smear of colour. More blur, less saturation. */
+  --scrim: rgba(0, 0, 0, 0.72);
+  --glass: rgba(9, 9, 9, 0.72);
+  --glass-blur: saturate(140%) blur(24px);
+
+  /* ── Skeleton ────────────────────────────────────────────────────────────
+     Its own pair rather than surface-2 → surface-3, which measured 1.088:1
+     in dark — a shimmer nobody could see. Tying the placeholder's contrast
+     to the elevation ladder meant that tuning the ladder silently broke the
+     loading state. 1.21:1 is visible without being a strobe. */
+  --skeleton-base: #151515;
+  --skeleton-hi: #262626;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LIGHT — the explicit opt-in
+   Applied only by [data-theme="light"], which `ThemeScript` sets before
+   first paint when the user chose light, or chose "system" and the OS is
+   light. Every token above that varies by theme is repeated here in the same
+   order. Nothing else in the file keys off `data-theme`.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* Brand — the 600 step; on white, 400 measures 2.4:1 and fails outright. */
+  --color-brand: #4f46e5;        /* 6.29:1 on white · 6.02:1 on canvas */
+  --color-brand-hover: #4740d4;
+  --color-brand-active: #4338ca; /* 7.90:1 */
+  --color-brand-fg: #ffffff;
+  --color-brand-tint: #eef0ff;
+  --color-brand-tint-hover: #e0e4ff;
+  --color-brand-ring: rgba(79, 70, 229, 0.28);
+
+  /* Accent — 700, not the obvious 500. #10B981 measures 3.61:1 and fails
+     AA as text; only `accent-vivid` keeps it, for large glyphs. */
+  --color-accent: #047857;       /* 5.25:1 on canvas */
+  --color-accent-hover: #036249;
+  --color-accent-fg: #ffffff;    /* 5.48:1 on accent */
+  --color-accent-tint: #ecfdf5;
+  --color-accent-vivid: #10b981;
+
+  /* Surfaces — slate-tinted, the mirror of the dark ladder. */
+  --color-canvas: #fafafa;
+  --color-surface: #ffffff;
+  --color-surface-2: #f1f5f9;
+  --color-surface-3: #e2e8f0;
+
+  --color-line: #e7e7ea;
+  --color-line-strong: #cbd5e1;
+
+  /* Text — slate-tinted here so neutrals harmonise with indigo rather than
+     fight it. (Dark goes achromatic instead; on near-black the same cast
+     reads as a blue theme rather than as warmth.) */
+  --color-ink: #18181b;   /* 16.97:1 */
+  --color-ink-2: #3f3f46; /* 10.01:1 */
+  --color-muted: #64748b; /*  4.56:1 — metadata. Do NOT lighten. */
+  --color-faint: #858c99; /*  3.27:1 — darkened from #94a3b8, which measured
+                             2.46:1 and failed the 3:1 floor. `faint` is now
+                             load-bearing for display-size marks in both
+                             themes, so it has to clear the bar in both. */
+  --color-inverse: #ffffff;
+
+  --color-success: #047857;
+  --color-success-tint: #ecfdf5;
+  --color-warn: #b45309;
+  --color-warn-tint: #fffbeb;
+  --color-danger: #be123c;
+  --color-danger-fill: #e11d48;
+  --color-danger-tint: #fff1f2;
+  --color-danger-fg: #ffffff;
+  --color-info: #4338ca;
+  --color-info-tint: #eef0ff;
+
+  /* ── Elevation · light ───────────────────────────────────────────────────
+     Stacked micro-offsets + an inset hairline. Several tiny shadows read as
+     *light*; one big blur reads as Material Design. This is the half of
+     rule 3 that dark mode does without.
+
+     Overrides `--elev-*`, never `--shadow-e*` — see the note in `@theme`. */
+  --elev-1: inset 0 0 0 1px rgba(15, 23, 42, 0.05),
+    0 1px 2px rgba(15, 23, 42, 0.04);
+  --elev-2: inset 0 0 0 1px rgba(15, 23, 42, 0.05),
+    0 2px 4px rgba(15, 23, 42, 0.04), 0 8px 16px -6px rgba(15, 23, 42, 0.06);
+  --elev-3: inset 0 0 0 1px rgba(15, 23, 42, 0.06),
+    0 4px 8px rgba(15, 23, 42, 0.04), 0 16px 32px -8px rgba(15, 23, 42, 0.1);
+  --elev-4: inset 0 0 0 1px rgba(15, 23, 42, 0.06),
+    0 24px 48px -12px rgba(15, 23, 42, 0.18);
+
   --scrim: rgba(15, 23, 42, 0.44);
   --glass: rgba(255, 255, 255, 0.82);
   --glass-blur: saturate(180%) blur(20px);
-}
 
-/* Dark palette. Applied by OS preference unless the user has explicitly
-   chosen light, and by the in-app toggle via [data-theme]. Kept as one
-   selector list so the two paths can never drift. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-
-    /* Premium dark is near-black, not Material's #121212 grey — Linear
-       #08090a, Raycast #07080a, Framer #090909 all land here. */
-    --color-canvas: #08090b;
-    --color-surface: #0f1114;
-    --color-surface-2: #16181c;
-    --color-surface-3: #1d2025;
-
-    --color-line: rgba(255, 255, 255, 0.08);
-    --color-line-strong: rgba(255, 255, 255, 0.14);
-
-    --color-ink: #f4f5f7;   /* 18.26:1 */
-    --color-ink-2: #c3c8d1; /* 11.86:1 */
-    --color-muted: #8b919d; /*  6.29:1 */
-    --color-faint: #5f656f;
-    --color-inverse: #08090b;
-
-    --color-brand: #818cf8;        /* 6.68:1 on canvas */
-    --color-brand-hover: #a5b4fc;
-    --color-brand-active: #c7cdfe;
-    --color-brand-fg: #08090b;     /* 6.68:1 — inverted button */
-    --color-brand-tint: rgba(129, 140, 248, 0.14);
-    --color-brand-tint-hover: rgba(129, 140, 248, 0.22);
-    --color-brand-ring: rgba(129, 140, 248, 0.34);
-
-    --color-accent: #34d399;       /* 10.36:1 */
-    --color-accent-hover: #6ee7b7;
-    --color-accent-fg: #08090b;
-    --color-accent-tint: rgba(52, 211, 153, 0.14);
-    --color-accent-vivid: #34d399;
-
-    --color-success: #34d399;
-    --color-success-tint: rgba(52, 211, 153, 0.14);
-    --color-warn: #fbbf24;
-    --color-warn-tint: rgba(251, 191, 36, 0.14);
-    --color-danger: #fb7185;
-    --color-danger-fill: #e11d48;
-    --color-danger-tint: rgba(251, 113, 133, 0.14);
-    --color-danger-fg: #ffffff;
-    --color-info: #a5b4fc;
-    --color-info-tint: rgba(165, 180, 252, 0.14);
-
-    /* Shadows are invisible on near-black. Elevation climbs the surface
-       ladder instead; these hairlines are what remains of it. */
-    --shadow-e1: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-    --shadow-e2: inset 0 0 0 1px rgba(255, 255, 255, 0.09);
-    --shadow-e3: inset 0 0 0 1px rgba(255, 255, 255, 0.11),
-      0 16px 32px -12px rgba(0, 0, 0, 0.7);
-    --shadow-e4: inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-      0 32px 64px -16px rgba(0, 0, 0, 0.8);
-
-    --scrim: rgba(0, 0, 0, 0.68);
-    --glass: rgba(15, 17, 20, 0.82);
-  }
-}
-
-:root[data-theme="dark"] {
-  color-scheme: dark;
-
-  --color-canvas: #08090b;
-  --color-surface: #0f1114;
-  --color-surface-2: #16181c;
-  --color-surface-3: #1d2025;
-
-  --color-line: rgba(255, 255, 255, 0.08);
-  --color-line-strong: rgba(255, 255, 255, 0.14);
-
-  --color-ink: #f4f5f7;
-  --color-ink-2: #c3c8d1;
-  --color-muted: #8b919d;
-  --color-faint: #5f656f;
-  --color-inverse: #08090b;
-
-  --color-brand: #818cf8;
-  --color-brand-hover: #a5b4fc;
-  --color-brand-active: #c7cdfe;
-  --color-brand-fg: #08090b;
-  --color-brand-tint: rgba(129, 140, 248, 0.14);
-  --color-brand-tint-hover: rgba(129, 140, 248, 0.22);
-  --color-brand-ring: rgba(129, 140, 248, 0.34);
-
-  --color-accent: #34d399;
-  --color-accent-hover: #6ee7b7;
-  --color-accent-fg: #08090b;
-  --color-accent-tint: rgba(52, 211, 153, 0.14);
-  --color-accent-vivid: #34d399;
-
-  --color-success: #34d399;
-  --color-success-tint: rgba(52, 211, 153, 0.14);
-  --color-warn: #fbbf24;
-  --color-warn-tint: rgba(251, 191, 36, 0.14);
-  --color-danger: #fb7185;
-  --color-danger-fill: #e11d48;
-  --color-danger-tint: rgba(251, 113, 133, 0.14);
-  --color-danger-fg: #ffffff;
-  --color-info: #a5b4fc;
-  --color-info-tint: rgba(165, 180, 252, 0.14);
-
-  --shadow-e1: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-  --shadow-e2: inset 0 0 0 1px rgba(255, 255, 255, 0.09);
-  --shadow-e3: inset 0 0 0 1px rgba(255, 255, 255, 0.11),
-    0 16px 32px -12px rgba(0, 0, 0, 0.7);
-  --shadow-e4: inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-    0 32px 64px -16px rgba(0, 0, 0, 0.8);
-
-  --scrim: rgba(0, 0, 0, 0.68);
-  --glass: rgba(15, 17, 20, 0.82);
+  --skeleton-base: #f1f5f9;
+  --skeleton-hi: #e2e8f0;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
    BASE
+   ──────────────────────────────────────────────────────────────────────────
+   `@layer base` IS LOAD-BEARING. Do not unwrap it.
+
+   Unlayered CSS beats layered CSS regardless of specificity, and Tailwind
+   emits every utility into `@layer utilities`. So an unlayered
+   `* { margin: 0; padding: 0 }` does not just reset the defaults — it
+   silently defeats `p-4`, `mt-8`, `py-20`, `container-page`, every spacing
+   utility in the app, resolving all of them to 0px. That is precisely what
+   the previous version of this file did, app-wide, invisibly: the layout was
+   not tight by design, it had no padding at all.
+
+   Declaring these inside `@layer base` puts them below `utilities` in the
+   cascade, which is where a reset belongs.
    ══════════════════════════════════════════════════════════════════════════ */
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-html {
-  font-size: 16px;
-  -webkit-text-size-adjust: 100%;
-}
+  html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
 
-body {
-  font-family: var(--font-sans);
-  /* cv01 = single-storey `a`; ss03 refines `g`. Both are what Linear and
-     Raycast enable globally, and they are most of the difference between
-     "Inter" and "a typeface someone chose". */
-  font-feature-settings: "cv01", "ss03", "calt", "kern";
-  background: var(--color-canvas);
-  color: var(--color-ink);
-  font-size: 1rem;
-  line-height: 1.58;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-}
+  body {
+    font-family: var(--font-sans);
+    /* cv01 = single-storey `a`; ss03 refines `g`. Both are what Linear and
+       Raycast enable globally, and they are most of the difference between
+       "Inter" and "a typeface someone chose". */
+    font-feature-settings: "cv01", "ss03", "calt", "kern";
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-size: 1rem;
+    line-height: 1.58;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
 
-img,
-svg,
-video {
-  display: block;
-  max-width: 100%;
-}
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 
-button {
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-}
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
 
-input,
-textarea,
-select {
-  font: inherit;
-  color: inherit;
-}
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
 
-::selection {
-  background: var(--color-brand-tint);
-  color: var(--color-brand-active);
-}
+  ::selection {
+    background: var(--color-brand-tint);
+    color: var(--color-brand-active);
+  }
 
-/* One focus treatment everywhere. Brand-coloured, so focus reads as
-   "actionable" using the same signal as every other action. */
-:focus-visible {
-  outline: 2px solid var(--color-brand);
-  outline-offset: 2px;
-  border-radius: var(--radius-xs);
-}
+  /* One focus treatment everywhere. Brand-coloured, so focus reads as
+     "actionable" using the same signal as every other action. Components may
+     override it — being in `base` is what lets them. */
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
 
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-line-strong);
-  border: 3px solid var(--color-canvas);
-  border-radius: var(--radius-full);
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border: 3px solid var(--color-canvas);
+    border-radius: var(--radius-full);
+  }
 }
 
 /* Framer Motion respects this via MotionConfig; this covers CSS transitions
-   and anything that slips through. */
+   and anything that slips through. Deliberately unlayered and `!important`:
+   this one must outrank everything, including utilities. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -583,12 +675,19 @@ select {
   -webkit-backdrop-filter: var(--glass-blur);
 }
 
-/* Badge sitting on top of a photograph, where surface tokens cannot be
-   trusted because the backdrop is user-supplied. */
+/* Badge or control sitting on top of a photograph, where surface tokens
+   cannot be trusted because the backdrop is user-supplied. Deliberately NOT
+   tokenised: being independent of the theme is the entire point.
+
+   The hairline matters more than it looks. Without it, a control on the
+   missing-image placeholder — which is a flat surface-2 field, now close to
+   this fill in value — dissolves into its own backdrop and leaves a glyph
+   floating in space. */
 @utility glass-on-photo {
   background: rgba(9, 9, 11, 0.58);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
   color: #ffffff;
 }
 
@@ -609,9 +708,9 @@ select {
 @utility skeleton {
   background-image: linear-gradient(
     90deg,
-    var(--color-surface-2) 25%,
-    var(--color-surface-3) 50%,
-    var(--color-surface-2) 75%
+    var(--skeleton-base) 25%,
+    var(--skeleton-hi) 50%,
+    var(--skeleton-base) 75%
   );
   background-size: 220% 100%;
   animation: skeleton-shimmer 1.4s linear infinite;

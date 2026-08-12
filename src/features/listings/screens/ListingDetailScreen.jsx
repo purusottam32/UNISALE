@@ -14,10 +14,13 @@ import {
   getDiscountPercent,
 } from "@/lib/format";
 import { getErrorMessage } from "@/lib/errors";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
+import { PackageX } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Skeleton from "@/components/ui/Skeleton";
-import { cn } from "@/components/ui/cn";
+import { EmptyState } from "@/components/ui/States";
+import { cn } from "@/lib/cn";
 import {
   ChevronLeftIcon,
   EyeIcon,
@@ -56,17 +59,15 @@ export default function ListingDetailScreen({ listingId, initialData }) {
   if (isLoading) return <DetailSkeleton />;
 
   if (error || !listing) {
+    /* Uses the shared EmptyState rather than a hand-rolled block, so the
+       "listing is gone" case matches every other dead end in the app. */
     return (
-      <div className="py-20 text-center">
-        <p className="text-4xl" aria-hidden>
-          🔍
-        </p>
-        <h1 className="mt-3 text-lg font-bold text-ink">This listing is gone</h1>
-        <p className="mt-1 text-sm text-muted">{error || "It may have sold or been removed."}</p>
-        <Button href="/explore" className="mt-5">
-          Browse other listings
-        </Button>
-      </div>
+      <EmptyState
+        icon={<PackageX size={iconSize.xl} strokeWidth={ICON_STROKE} />}
+        title="This listing is gone"
+        description={error || "It may have sold or been removed."}
+        action={{ label: "Browse other listings", href: "/explore" }}
+      />
     );
   }
 
@@ -131,28 +132,28 @@ export default function ListingDetailScreen({ listingId, initialData }) {
               {isSold && <Badge tone="danger">Sold</Badge>}
             </div>
 
-            <h1 className="mt-3 text-2xl font-extrabold leading-tight tracking-[-0.02em] text-ink">
-              {listing.title}
-            </h1>
+            <h1 className="mt-4 text-headline text-ink">{listing.title}</h1>
 
-            <div className="mt-2 flex flex-wrap items-baseline gap-2.5">
-              <span className="text-3xl font-extrabold tracking-[-0.02em] text-ink">
+            <div className="mt-3 flex flex-wrap items-baseline gap-2.5">
+              {/* The price scale, paired with `.tabular` — a price that reflows
+                  as digits change is the detail that reads as amateur. */}
+              <span className="text-price-lg tabular text-ink">
                 {listing.type === "giveaway" ? "Free" : formatPrice(listing.price)}
               </span>
               {listing.originalPrice > listing.price && (
                 <>
-                  <span className="text-base text-muted line-through">
+                  <span className="text-body tabular text-muted line-through">
                     {formatPrice(listing.originalPrice)}
                   </span>
-                  <Badge tone="success">{discount}% off</Badge>
+                  <Badge tone="neutral">{discount}% off</Badge>
                 </>
               )}
               {listing.isNegotiable && listing.type === "sale" && (
-                <span className="text-sm text-muted">· Negotiable</span>
+                <span className="text-body-sm text-muted">· Negotiable</span>
               )}
             </div>
 
-            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted">
+            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-caption text-muted">
               <span className="inline-flex items-center gap-1">
                 <MapPinIcon /> {listing.college}
               </span>
@@ -167,16 +168,16 @@ export default function ListingDetailScreen({ listingId, initialData }) {
           </section>
 
           <section>
-            <h2 className="text-sm font-bold text-ink">Description</h2>
-            <p className="mt-2 whitespace-pre-line text-[15px] leading-relaxed text-ink-2">
+            <h2 className="text-micro uppercase text-muted">Description</h2>
+            <p className="mt-2.5 whitespace-pre-line text-body leading-relaxed text-ink-2">
               {listing.description}
             </p>
           </section>
 
           {listing.meetupHint && (
-            <section className="rounded-lg border border-line bg-surface p-4">
-              <h2 className="text-sm font-bold text-ink">Where to meet</h2>
-              <p className="mt-1 text-sm text-ink-2">{listing.meetupHint}</p>
+            <section className="rounded-lg bg-surface p-5 shadow-e1">
+              <h2 className="text-micro uppercase text-muted">Where to meet</h2>
+              <p className="mt-2 text-body-sm text-ink-2">{listing.meetupHint}</p>
             </section>
           )}
 
@@ -228,7 +229,7 @@ export default function ListingDetailScreen({ listingId, initialData }) {
 
       {similar.length > 0 && (
         <section>
-          <h2 className="mb-3 text-lg font-bold text-ink">More like this</h2>
+          <h2 className="mb-4 text-title text-ink">More like this</h2>
           <div className="rail -mx-4 px-4 md:mx-0 md:px-0">
             {similar.map((item) => (
               <div key={item._id} className="w-[168px]">
@@ -246,7 +247,9 @@ export default function ListingDetailScreen({ listingId, initialData }) {
 
       {!isOwner && (
         <div
-          className="fixed inset-x-0 z-40 flex gap-2 border-t border-line bg-surface/96 p-3 backdrop-blur-md lg:hidden"
+          /* Same chrome mechanism as TopBar and BottomNav: glass plus a hairline
+             drawn as a shadow, so it costs no layout and matches the rest. */
+          className="glass-chrome fixed inset-x-0 z-40 flex gap-2 p-3 shadow-[0_-1px_0_var(--color-line)] lg:hidden"
           style={{ bottom: "calc(var(--tabbar-h) + env(safe-area-inset-bottom))" }}
         >
           <Button

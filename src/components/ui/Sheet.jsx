@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { cn } from "./cn";
+import { cn } from "@/lib/cn";
 import { CloseIcon } from "./icons";
 
 /**

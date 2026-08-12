@@ -12,6 +12,7 @@ import {
 } from "@/features/auth/api";
 import { compressImage } from "@/lib/compress-image";
 import { getErrorMessage } from "@/lib/errors";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import Sheet from "@/components/ui/Sheet";
@@ -198,10 +199,12 @@ export default function SettingsScreen() {
           <div className="flex flex-wrap gap-2">
             {LISTING_CATEGORIES.map((category) => {
               const selected = interests.includes(category);
+              const CategoryIcon = CATEGORY_META[category].Icon;
               return (
                 <Chip
                   key={category}
                   active={selected}
+                  icon={<CategoryIcon size={iconSize.xs} strokeWidth={ICON_STROKE} aria-hidden />}
                   onClick={() =>
                     setInterests((current) =>
                       selected
@@ -212,7 +215,6 @@ export default function SettingsScreen() {
                     )
                   }
                 >
-                  <span aria-hidden>{CATEGORY_META[category]?.emoji}</span>
                   {category}
                 </Chip>
               );

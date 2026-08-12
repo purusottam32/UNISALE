@@ -9,10 +9,12 @@ import { useAuth } from "@/features/auth/auth-context";
 import { formatMessageTime, formatPrice } from "@/lib/format";
 import Avatar from "@/components/ui/Avatar";
 import Skeleton from "@/components/ui/Skeleton";
-import { cn } from "@/components/ui/cn";
+import { cn } from "@/lib/cn";
 import { CheckIcon, ChevronLeftIcon, SendIcon, ShieldIcon } from "@/components/ui/icons";
 import { useConversation } from "../hooks";
 import { useSocket } from "../socket-provider";
+import { ImageOff } from "lucide-react";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 
 /** Suggested openers — a blank chat box is where most first contacts die. */
 const QUICK_REPLIES = [
@@ -117,7 +119,9 @@ export default function ConversationScreen({ conversationId }) {
                   className="h-9 w-9 rounded-md object-cover"
                 />
               ) : (
-                <span className="grid h-9 w-9 place-items-center rounded-md bg-surface-3">📦</span>
+                <span className="grid h-9 w-9 place-items-center rounded-md bg-surface-3 text-faint">
+                  <ImageOff size={iconSize.md} strokeWidth={ICON_STROKE} aria-hidden />
+                </span>
               )}
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[13px] font-medium text-ink">

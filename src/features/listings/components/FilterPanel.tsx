@@ -11,6 +11,7 @@ import {
   SORT_OPTIONS,
 } from "@/config/catalog";
 import { formatCount } from "@/lib/format";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 import Drawer from "@/components/ui/Drawer";
 import Button from "@/components/ui/Button";
 import Chip from "@/components/ui/Chip";
@@ -152,16 +153,19 @@ export default function FilterPanel({
 
         <Group label="Category">
           <Wrap>
-            {LISTING_CATEGORIES.map((category) => (
-              <Chip
-                key={category}
-                active={draft.category === category}
-                icon={<span aria-hidden>{CATEGORY_META[category].emoji}</span>}
-                onClick={() => toggle("category", category)}
-              >
-                {category}
-              </Chip>
-            ))}
+            {LISTING_CATEGORIES.map((category) => {
+              const { Icon } = CATEGORY_META[category];
+              return (
+                <Chip
+                  key={category}
+                  active={draft.category === category}
+                  icon={<Icon size={iconSize.xs} strokeWidth={ICON_STROKE} aria-hidden />}
+                  onClick={() => toggle("category", category)}
+                >
+                  {category}
+                </Chip>
+              );
+            })}
           </Wrap>
         </Group>
 

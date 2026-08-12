@@ -68,7 +68,7 @@ export default function BottomNav() {
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex h-full flex-col items-center justify-center gap-1",
-                  "text-[0.625rem] font-medium transition-colors duration-[--duration-fast]",
+                  "text-nano transition-colors duration-[--duration-fast]",
                   active ? "text-brand" : "text-muted"
                 )}
               >
@@ -83,7 +83,7 @@ export default function BottomNav() {
                   />
                   {count > 0 && (
                     <span
-                      className="absolute -right-2 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-danger-fill px-1 text-[0.5625rem] tabular font-bold leading-none text-white"
+                      className="absolute -right-2 -top-1 grid h-[17px] min-w-[17px] place-items-center rounded-full bg-danger-fill px-1 text-nano tabular text-white"
                       aria-label={`${count} unread`}
                     >
                       {count > 9 ? "9+" : count}

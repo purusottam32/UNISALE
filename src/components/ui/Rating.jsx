@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { cn } from "./cn";
+import { cn } from "@/lib/cn";
 import { StarIcon } from "./icons";
 
 /** Read-only star row with an optional "(12)" count. */

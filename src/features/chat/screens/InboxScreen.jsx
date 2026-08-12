@@ -6,9 +6,11 @@ import { formatMessageTime } from "@/lib/format";
 import Avatar from "@/components/ui/Avatar";
 import { EmptyState } from "@/components/ui/States";
 import { ConversationRowSkeleton } from "@/components/ui/Skeleton";
-import { cn } from "@/components/ui/cn";
+import { cn } from "@/lib/cn";
 import { useConversations } from "../hooks";
 import { useSocket } from "../socket-provider";
+import { ImageOff, MessageCircle } from "lucide-react";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 
 /**
  * Conversation list.
@@ -34,7 +36,7 @@ export default function InboxScreen({ activeId = null }) {
   if (conversations.length === 0) {
     return (
       <EmptyState
-        glyph="💬"
+        icon={<MessageCircle size={iconSize.xl} strokeWidth={ICON_STROKE} />}
         title="No chats yet"
         description="When you message a seller — or someone asks about your listing — the conversation shows up here."
         action={{ label: "Find something to buy", href: "/explore" }}
@@ -109,8 +111,8 @@ export default function InboxScreen({ activeId = null }) {
                         className="h-[18px] w-[18px] rounded-full object-cover"
                       />
                     ) : (
-                      <span className="grid h-[18px] w-[18px] place-items-center rounded-full bg-surface-3 text-[9px]">
-                        📦
+                      <span className="grid h-[18px] w-[18px] place-items-center rounded-full bg-surface-3 text-faint">
+                        <ImageOff size={11} strokeWidth={ICON_STROKE} aria-hidden />
                       </span>
                     )}
                     <span className="truncate text-[11px] text-muted">{listing.title}</span>

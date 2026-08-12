@@ -41,18 +41,24 @@ const SURFACES = [
   { token: "surface-3", cls: "bg-surface-3", note: "pressed" },
 ];
 
+/**
+ * Ratios are quoted per theme, dark first, because dark is the default and a
+ * single number here would be wrong half the time. Both figures are measured
+ * against the token's own backdrop — `canvas` for text, the paired fill for
+ * actions.
+ */
 const TEXT_TOKENS = [
-  { token: "ink", cls: "text-ink", note: "headings, prices", ratio: "16.97:1" },
-  { token: "ink-2", cls: "text-ink-2", note: "body copy", ratio: "10.01:1" },
-  { token: "muted", cls: "text-muted", note: "metadata", ratio: "4.56:1" },
-  { token: "faint", cls: "text-faint", note: "disabled only", ratio: "2.46:1" },
+  { token: "ink", cls: "text-ink", note: "headings, prices", dark: "18.26:1", light: "16.97:1" },
+  { token: "ink-2", cls: "text-ink-2", note: "body copy", dark: "12.02:1", light: "10.01:1" },
+  { token: "muted", cls: "text-muted", note: "metadata", dark: "6.32:1", light: "4.56:1" },
+  { token: "faint", cls: "text-faint", note: "large marks, disabled", dark: "3.17:1", light: "3.27:1" },
 ];
 
 const ACTION_TOKENS = [
-  { token: "brand", cls: "bg-brand text-brand-fg", note: "primary action", ratio: "6.29:1" },
-  { token: "accent", cls: "bg-accent text-accent-fg", note: "trust, verified", ratio: "5.48:1" },
-  { token: "danger", cls: "bg-danger text-danger-fg", note: "destructive", ratio: "6.02:1" },
-  { token: "warn", cls: "bg-warn text-inverse", note: "caution", ratio: "4.81:1" },
+  { token: "brand", cls: "bg-brand text-brand-fg", note: "primary action", dark: "6.65:1", light: "6.29:1" },
+  { token: "accent", cls: "bg-accent text-accent-fg", note: "trust, verified", dark: "10.33:1", light: "5.48:1" },
+  { token: "danger", cls: "bg-danger text-danger-fg", note: "destructive", dark: "7.35:1", light: "6.02:1" },
+  { token: "warn", cls: "bg-warn text-inverse", note: "caution", dark: "11.88:1", light: "5.02:1" },
 ];
 
 const TYPE_SCALE = [
@@ -200,7 +206,7 @@ export default function DesignSystemScreen() {
               <div key={item.token} className="rounded-lg bg-surface p-4 shadow-e1">
                 <p className={cn("text-title", item.cls)}>Aa</p>
                 <p className="mt-2 text-body-sm font-medium text-ink">{item.token}</p>
-                <Spec label={item.note} value={item.ratio} />
+                <Spec label={item.note} value={`${item.dark} dark · ${item.light} light`} />
               </div>
             ))}
           </Grid>
@@ -218,7 +224,7 @@ export default function DesignSystemScreen() {
                   Action
                 </div>
                 <p className="text-body-sm font-medium text-ink">{item.token}</p>
-                <Spec label={item.note} value={item.ratio} />
+                <Spec label={item.note} value={`${item.dark} dark · ${item.light} light`} />
               </div>
             ))}
           </Grid>

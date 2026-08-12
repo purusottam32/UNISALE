@@ -107,7 +107,7 @@ export default function SearchBar({
         id: `${listboxId}-category-${i}`,
         kind: "category" as const,
         label: category,
-        emoji: CATEGORY_META[category]?.emoji,
+        Icon: CATEGORY_META[category]?.Icon,
         meta: CATEGORY_META[category]?.blurb,
         href: `/explore?category=${encodeURIComponent(category)}`,
       }));

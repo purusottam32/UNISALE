@@ -237,13 +237,33 @@ accent       #34D399   (emerald-400)
 Computed, not estimated. WCAG AA needs **4.5:1** body text, **3:1** large text
 and UI state.
 
+Dark is the default, so it is listed first.
+
+**Dark** — achromatic ladder `#090909 / #121212 / #1a1a1a / #242424`:
+
+| Pair | Ratio | Verdict |
+|---|---|---|
+| ink `#f5f5f5` on canvas | **18.26** | AAA |
+| ink-2 `#c9c9c9` on canvas | **12.02** | AAA |
+| muted `#919191` on canvas | **6.32** | AA ✓ |
+| muted on **surface-3** | **4.93** | AA ✓ — **the binding constraint** |
+| faint `#606060` on canvas | **3.17** | AA ✓ large text / non-text |
+| indigo-400 on canvas | **6.67** | AA ✓ — links, focus ring |
+| canvas on indigo-400 | **6.65** | AA ✓ — inverted primary button |
+| emerald-400 on canvas | **10.33** | AAA — verification only |
+| canvas on danger `#fb7185` | **7.35** | AA ✓ — solid destructive button |
+| white on danger-fill | **4.71** | AA ✓ — unread counters |
+| skeleton-hi on skeleton-base | 1.21 | shimmer, visible not strobing |
+
+**Light** — `[data-theme="light"]`, slate-tinted:
+
 | Pair | Ratio | Verdict |
 |---|---|---|
 | ink on canvas | **16.97** | AAA |
 | ink-2 on canvas | **10.01** | AAA |
 | muted on canvas | **4.56** | AA ✓ (tight — do not lighten) |
 | muted on surface | **4.76** | AA ✓ |
-| faint on canvas | 2.46 | ✗ **decorative / disabled only** |
+| faint `#858c99` on canvas | **3.27** | AA ✓ large text / non-text |
 | white on indigo-600 | **6.29** | AA ✓ — primary button |
 | indigo-600 on canvas | **6.02** | AA ✓ — links, focus ring |
 | white on indigo-700 | **7.90** | AAA — pressed |
@@ -251,12 +271,19 @@ and UI state.
 | white on emerald-700 | **5.48** | AA ✓ |
 | emerald-500 on canvas | 3.61 | ✗ **large text / icons only** |
 | danger on canvas | **6.02** | AA ✓ |
-| white on danger-fill | **4.70** | AA ✓ |
-| **dark** ink on canvas | **18.26** | AAA |
-| dark muted on canvas | **6.29** | AA ✓ |
-| dark indigo-400 on canvas | **6.68** | AA ✓ |
-| dark canvas on indigo-400 | **6.68** | AA ✓ — inverted button |
-| dark emerald-400 on canvas | **10.36** | AAA |
+
+Two figures moved, and both were bugs rather than preferences:
+
+> **`faint` cleared the 3:1 floor.** It measured 2.46:1 light and ~2.5:1 dark —
+> below the large-text/non-text minimum, which meant nothing visible could
+> legitimately use it. Darkened in both themes so the landing page can set 40px
+> step numerals in it.
+
+> **`danger-fg` inverted in dark.** `danger` lightens to `#fb7185` there, so the
+> inherited white gave the solid destructive button a measured **2.69:1**. It now
+> inverts to near-black like `brand-fg` and `accent-fg` do. The unread counters
+> keep literal white because they sit on `danger-fill`, which is the same colour
+> in both themes.
 
 > **Trap avoided:** the obvious emerald (`#10B981`) fails at 3.61:1 on light and
 > 3.77:1 as a button fill. Shipping it as accent *text* would have been an
@@ -360,17 +387,47 @@ e4  0 0 0 1px rgba(15,23,42,.06) inset,
     0 24px 48px -12px rgba(15,23,42,.18)          modals, sheets
 ```
 
-**Dark mode uses no shadows at all.** Elevation = climb the surface ladder
-(`surface` → `surface-2` → `surface-3`) plus a `rgba(255,255,255,.08)` hairline.
-This is Raycast's model and it is the correct one — shadows are invisible on
-near-black.
+**In dark, elevation is mostly the surface ladder** (`surface` → `surface-2` →
+`surface-3`) plus a `rgba(255,255,255,.055)` hairline. This is Raycast's model
+and it is the right one, because a drop shadow is invisible on near-black.
 
-**Glassmorphism, strictly rationed.** Exactly two places, both where content
-scrolls *underneath* chrome and the blur communicates that relationship:
-the sticky top bar and the mobile tab bar. `backdrop-filter: blur(20px)
-saturate(180%)` over a 92%-opaque surface (Apple's exact recipe). **Nowhere
-else.** Glass on a card is decoration; glass on a scroll boundary is
-information.
+**`e2` is the one exception, and it earns it.** ProductCard's hover contract is
+that *the photograph* lifts — and an inset hairline drawn inside a photo's own
+edge cannot be seen, which left the 1.045 scale carrying the entire hover state
+alone. So `e2` in dark is *outset*: a faint halo around the lifted element, which
+is what "picked up off the page" actually looks like on a dark ground.
+
+**A box outline is `shadow-e1`, never `border`.** This is the rule the codebase
+got wrong at scale — `border border-line` appeared in 29 files against
+`shadow-e*` in 16, which is how a system designed around hairlines-or-shadows
+ended up drawing outlined boxes inside outlined boxes in both themes. `border`
+also adds a pixel to the box, which is why nested cards misaligned.
+`--color-line` is for separators only: chrome hairlines, `divide-y`, table rules.
+
+**Shadow tokens are indirected through `--elev-*`.** Tailwind bakes `--shadow-*`
+values into the utility class at build time instead of emitting
+`var(--shadow-e2)`, so per-theme redeclaration of a shadow token silently does
+nothing — which is exactly how the previous version of this system shipped
+light-mode shadows to dark mode without anyone noticing. Override `--elev-*`.
+
+**Glassmorphism, strictly rationed.** Only where content scrolls *underneath*
+chrome and the blur communicates that relationship: the sticky top bar, the
+mobile tab bar, and the listing detail action bar. **Nowhere else.** Glass on a
+card is decoration; glass on a scroll boundary is information.
+
+Light keeps Apple's recipe, `saturate(180%) blur(20px)` over an 82%-opaque
+surface. Dark deviates twice on purpose: it derives `--glass` from **canvas**
+rather than surface, because chrome sitting over scrolling content should recede
+below it rather than float above it as a lighter plate; and it drops to
+`saturate(140%) blur(24px)`, because over-saturating on near-black amplifies
+whatever bleeds through and turns a listing photo passing under the top bar into
+a smear of colour. More blur, less saturation.
+
+`glass-on-photo` is separate and deliberately **not** tokenised — being
+independent of the theme is its entire purpose, since the backdrop is a
+user-supplied photograph. It carries its own `rgba(255,255,255,.10)` inset
+hairline so that a control sitting on the missing-image placeholder, which is now
+close to it in value, does not dissolve into its own backdrop.
 
 ### 4.8 Motion
 

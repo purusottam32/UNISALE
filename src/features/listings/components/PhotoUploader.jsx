@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { compressImages } from "@/lib/compress-image";
-import { cn } from "@/components/ui/cn";
+import { cn } from "@/lib/cn";
 import { CameraIcon, CloseIcon, PlusIcon } from "@/components/ui/icons";
 
 const MAX_PHOTOS = 5;

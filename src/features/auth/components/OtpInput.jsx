@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { cn } from "@/components/ui/cn";
+import { cn } from "@/lib/cn";
 
 const LENGTH = 6;
 

@@ -24,14 +24,3 @@ export default function AppShell({ children, width = "default" }) {
     </div>
   );
 }
-
-/** Full-bleed variant for the chat thread, which manages its own scrolling. */
-export function AppShellBleed({ children }) {
-  return (
-    <div className="flex min-h-screen flex-col bg-canvas">
-      <TopBar />
-      <main className="flex flex-1 flex-col">{children}</main>
-      <BottomNav />
-    </div>
-  );
-}

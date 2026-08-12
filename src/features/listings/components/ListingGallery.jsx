@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { cn } from "@/components/ui/cn";
+import { cn } from "@/lib/cn";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/ui/icons";
+import { ImageOff } from "lucide-react";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 
 /**
  * Listing photo gallery.
@@ -36,8 +38,8 @@ export default function ListingGallery({ images = [], title = "" }) {
 
   if (count === 0) {
     return (
-      <div className="grid aspect-[4/3] place-items-center rounded-lg bg-surface-2 text-4xl text-muted">
-        <span aria-hidden>📦</span>
+      <div className="grid aspect-[4/3] place-items-center rounded-lg bg-surface-2 text-faint">
+        <ImageOff size={iconSize["2xl"]} strokeWidth={ICON_STROKE} aria-hidden />
       </div>
     );
   }

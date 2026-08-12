@@ -4,6 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { StarIcon } from "@/components/ui/icons";
 import ReviewSheet from "./ReviewSheet";
+import { ImageOff } from "lucide-react";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 
 /**
  * Surfaces deals the user closed but never rated.
@@ -46,8 +48,8 @@ export default function PendingReviewPrompt({ deals = [] }) {
                   className="h-10 w-10 shrink-0 rounded-md object-cover"
                 />
               ) : (
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-surface-3 text-lg">
-                  📦
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-surface-3 text-faint">
+                  <ImageOff size={iconSize.md} strokeWidth={ICON_STROKE} aria-hidden />
                 </span>
               )}
 

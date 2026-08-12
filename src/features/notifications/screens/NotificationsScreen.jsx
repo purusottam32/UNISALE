@@ -6,16 +6,31 @@ import { formatRelativeTime } from "@/lib/format";
 import Button from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/States";
 import Skeleton from "@/components/ui/Skeleton";
-import { cn } from "@/components/ui/cn";
+import { cn } from "@/lib/cn";
 import { useMarkNotificationRead, useNotifications } from "../hooks";
+import {
+  AlertTriangle,
+  Bell,
+  Handshake,
+  MessageCircle,
+  PartyPopper,
+  Star,
+  TrendingDown,
+} from "lucide-react";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 
-const TYPE_EMOJI = {
-  message: "💬",
-  listing_sold: "🤝",
-  review_received: "⭐",
-  wishlist_price_drop: "📉",
-  listing_removed: "⚠️",
-  welcome: "🎉",
+/**
+ * One icon per notification type, so a glance down the list reads as a shape
+ * before it reads as words. Falls back to the bell for a type the client does
+ * not know about yet — the API can add one without shipping a UI change.
+ */
+const TYPE_ICON = {
+  message: MessageCircle,
+  listing_sold: Handshake,
+  review_received: Star,
+  wishlist_price_drop: TrendingDown,
+  listing_removed: AlertTriangle,
+  welcome: PartyPopper,
 };
 
 export default function NotificationsScreen() {
@@ -57,7 +72,7 @@ export default function NotificationsScreen() {
 
       {notifications.length === 0 ? (
         <EmptyState
-          glyph="🔔"
+          icon={<Bell size={iconSize.xl} strokeWidth={ICON_STROKE} />}
           title="Nothing new"
           description="Messages, price drops on saved items, and ratings will land here."
           action={{ label: "Browse listings", href: "/explore" }}
@@ -85,9 +100,14 @@ export default function NotificationsScreen() {
                     className="h-10 w-10 shrink-0 rounded-full object-cover"
                   />
                 ) : (
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface-2 text-lg">
-                    {TYPE_EMOJI[notification.type] || "🔔"}
-                  </span>
+                  (() => {
+                    const TypeIcon = TYPE_ICON[notification.type] || Bell;
+                    return (
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface-2 text-muted">
+                        <TypeIcon size={iconSize.md} strokeWidth={ICON_STROKE} aria-hidden />
+                      </span>
+                    );
+                  })()
                 )}
 
                 <span className="min-w-0 flex-1">

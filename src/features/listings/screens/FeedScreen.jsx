@@ -7,8 +7,10 @@ import { usePendingReviews } from "@/features/profile/hooks";
 import { useSaveToggle } from "@/features/saved/hooks";
 import Button from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/States";
-import Skeleton from "@/components/ui/Skeleton";
-import { ArrowRightIcon, PlusIcon, SparkleIcon } from "@/components/ui/icons";
+import { ProductCardSkeleton } from "@/components/ui/Skeleton";
+import { ArrowRightIcon, PlusIcon } from "@/components/ui/icons";
+import { Sprout } from "lucide-react";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 import { useCampusFeed, useTrendingListings } from "../hooks";
 import ProductCard from "../components/ProductCard";
 import ListingGrid from "../components/ListingGrid";
@@ -25,7 +27,8 @@ import PendingReviewPrompt from "@/features/profile/components/PendingReviewProm
  */
 export default function FeedScreen() {
   const { user } = useAuth();
-  const { listings, totalItems, isLoading, hasMore, loadMore, isFetchingMore } = useCampusFeed();
+  const { listings, totalItems, isLoading, hasMore, loadMore, isFetchingMore, error, refetch } =
+    useCampusFeed();
   const { listings: trending, isLoading: trendingLoading } = useTrendingListings({ limit: 10 });
   const { pending } = usePendingReviews();
   const { isSaved, toggle, isPending } = useSaveToggle();
@@ -36,10 +39,8 @@ export default function FeedScreen() {
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-[-0.02em] text-ink">
-            Hey {firstName} 👋
-          </h1>
-          <p className="mt-1 text-sm text-muted">
+          <h1 className="text-display-md text-ink">Hey {firstName}</h1>
+          <p className="mt-1.5 text-body-sm text-muted">
             {user?.college ? `What's moving at ${user.college} today` : "What's moving on campus today"}
           </p>
         </div>
@@ -53,43 +54,59 @@ export default function FeedScreen() {
       <ProfileNudge user={user} />
 
       <section>
-        <div className="rail -mx-4 px-4 md:mx-0 md:px-0">
-          {LISTING_CATEGORIES.map((category) => (
-            <Link
-              key={category}
-              href={`/explore?category=${encodeURIComponent(category)}`}
-              className="flex w-[92px] flex-col items-center gap-2 rounded-lg border border-line bg-surface px-2 py-3 text-center transition-colors hover:border-brand hover:bg-brand-tint"
-            >
-              <span className="text-2xl" aria-hidden>
-                {CATEGORY_META[category]?.emoji}
-              </span>
-              <span className="text-[11px] font-semibold leading-tight text-ink-2">{category}</span>
-            </Link>
-          ))}
+        {/* Chips, not bordered tiles. Ten outlined boxes in a row read as ten
+            competing objects; a chip rail reads as one control — and it is the
+            same rail idiom `FilterBar` already uses one route away.
+
+            Hover shifts the label rather than filling the chip with brand-tint:
+            at 14% alpha over `surface` that fill was nearly invisible anyway,
+            and painting a non-button with the accent breaks the colour rule. */}
+        <div className="rail rail-bleed gap-2">
+          {LISTING_CATEGORIES.map((category) => {
+            const { Icon } = CATEGORY_META[category];
+            return (
+              <Link
+                key={category}
+                href={`/explore?category=${encodeURIComponent(category)}`}
+                className="group inline-flex h-9 items-center gap-2 rounded-full bg-surface px-3.5 text-body-sm text-ink-2 shadow-e1 transition-colors duration-[--duration-fast] hover:bg-surface-2 hover:text-ink"
+              >
+                <Icon
+                  size={iconSize.xs}
+                  strokeWidth={ICON_STROKE}
+                  aria-hidden
+                  className="text-muted transition-colors duration-[--duration-fast] group-hover:text-ink-2"
+                />
+                {category}
+              </Link>
+            );
+          })}
         </div>
       </section>
 
       {(trendingLoading || trending.length > 0) && (
         <section>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="flex items-center gap-2 text-lg font-bold text-ink">
-              <span className="text-warn">
-                <SparkleIcon size={17} />
-              </span>
-              Moving fast on campus
-            </h2>
+            <h2 className="text-title text-ink">Moving fast on campus</h2>
             <Link
               href="/explore?sort=views%3Adesc"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-brand"
+              className="group inline-flex items-center gap-1.5 text-body-sm font-medium text-muted transition-colors duration-[--duration-fast] hover:text-ink"
             >
-              See all <ArrowRightIcon size={15} />
+              See all
+              <ArrowRightIcon
+                size={15}
+                className="transition-transform duration-[--duration-fast] group-hover:translate-x-0.5"
+              />
             </Link>
           </div>
 
           <div className="rail -mx-4 px-4 md:mx-0 md:px-0">
             {trendingLoading
-              ? Array.from({ length: 4 }, (_, index) => (
-                  <Skeleton key={index} className="h-[248px] w-[168px]" rounded="rounded-lg" />
+              ? /* The composed skeleton, not a bare block: it mirrors the card's
+                   photo plus three text rows, so nothing shifts on arrival. */
+                Array.from({ length: 4 }, (_, index) => (
+                  <div key={index} className="w-[168px]">
+                    <ProductCardSkeleton />
+                  </div>
                 ))
               : trending.map((listing) => (
                   <div key={listing._id} className="w-[168px]">
@@ -107,8 +124,11 @@ export default function FeedScreen() {
 
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-ink">For you</h2>
-          <Link href="/explore" className="text-sm font-semibold text-brand">
+          <h2 className="text-title text-ink">For you</h2>
+          <Link
+            href="/explore"
+            className="text-body-sm font-medium text-muted transition-colors duration-[--duration-fast] hover:text-ink"
+          >
             Browse all
           </Link>
         </div>
@@ -119,9 +139,11 @@ export default function FeedScreen() {
           hasMore={hasMore}
           onLoadMore={loadMore}
           isFetchingMore={isFetchingMore}
+          error={error}
+          onRetry={refetch}
           emptyState={
             <EmptyState
-              glyph="🌱"
+              icon={<Sprout size={iconSize.xl} strokeWidth={ICON_STROKE} />}
               title={
                 totalItems === 0 && user?.college
                   ? `${user.college} is just getting started`

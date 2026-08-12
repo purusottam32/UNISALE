@@ -9,7 +9,7 @@ import { getErrorMessage } from "@/lib/errors";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import Sheet from "@/components/ui/Sheet";
-import { cn } from "@/components/ui/cn";
+import { cn } from "@/lib/cn";
 import { EditIcon, EyeIcon, HeartIcon, ChatIcon, TrashIcon } from "@/components/ui/icons";
 import { useDeleteListing, useUpdateListingStatus } from "../hooks";
 

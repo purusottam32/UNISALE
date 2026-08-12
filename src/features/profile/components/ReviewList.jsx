@@ -4,12 +4,14 @@ import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/States";
 import { RatingStars } from "@/components/ui/Rating";
+import { Star } from "lucide-react";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 
 export default function ReviewList({ reviews = [], emptyMessage }) {
   if (reviews.length === 0) {
     return (
       <EmptyState
-        glyph="⭐"
+        icon={<Star size={iconSize.xl} strokeWidth={ICON_STROKE} />}
         title="No reviews yet"
         description={emptyMessage || "Ratings appear here once a deal is completed and rated."}
       />

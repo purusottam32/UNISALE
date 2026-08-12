@@ -226,21 +226,42 @@ token produces one refresh, not six.
 and no `dark:` variant anywhere in the markup.
 
 Every colour is a `--color-*` token declared in `@theme`. Tailwind v4 emits
-utilities that *reference* those variables, so re-pointing a token inside the
-dark blocks re-themes every `bg-surface`, `text-ink` and `border-line` in the
-app at once.
+utilities that *reference* those variables, so re-pointing a token in the light
+block re-themes every `bg-surface`, `text-ink` and `border-line` in the app at
+once.
+
+**Shadows are the exception and it matters.** Tailwind treats `--shadow-*` as a
+build-time constant: it bakes the value into `.shadow-e2` rather than emitting
+`var(--shadow-e2)`, so redeclaring a shadow token per theme does nothing. The
+shadow tokens therefore point at plain `--elev-*` custom properties, and it is
+those that each theme overrides. Do not inline shadow values into `@theme`.
 
 ```
 canvas → surface → surface-2 → surface-3     backgrounds, furthest to nearest
-ink → ink-2 → muted                          text, primary to metadata
-line → line-strong                           borders
-brand / positive / caution / critical / info each with a -soft companion
+ink → ink-2 → muted → faint                  text, primary to decorative
+line → line-strong                           SEPARATORS ONLY, never box outlines
+brand / accent / success / warn / danger / info   each with a -tint companion
 ```
 
-Light is the default — second-hand goods sell on their photos, and photos read
-better on a light canvas. Dark follows the OS unless the user overrides it with
-the toggle, which stamps `data-theme` on `<html>`. `ThemeScript` in the root
-layout applies the stored choice before first paint so there is no flash.
+**Dark is the default.** `@theme` carries the dark palette, so dark is what you
+get with no attribute set — including for a first-time visitor whose OS prefers
+light. Light is an explicit opt-in, declared once in `:root[data-theme="light"]`.
+
+`data-theme` is single-purpose: a light-override flag. There is no
+`[data-theme="dark"]` selector and no `prefers-color-scheme` block. The
+three-state toggle (dark / light / system) resolves "system" in JS instead —
+`ThemeScript` in the root layout reads `localStorage` before first paint and adds
+the light flag when the stored choice is `light`, or is `system` and the OS
+prefers light. Keeping resolution in JS is what lets each palette be written
+exactly once instead of duplicated across a media query and an attribute.
+
+Two consequences worth knowing: with no JS you get dark, always; and "system" is
+now a state the user opts *into* rather than the default, so it is written to
+storage rather than expressed by deleting the key.
+
+A box outline is `shadow-e1`, never `border`. A `border` adds a pixel to the box
+— which is why nested cards used to misalign — and produces a hairline in both
+themes, violating "light gets shadows, dark gets a surface ladder".
 
 `components/ui/` holds the primitives (Button, Badge, Avatar, Field, Sheet,
 Skeleton, Tabs, Rating, EmptyState, TrustBadge, icons). Import them from

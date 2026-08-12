@@ -1,7 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { Clock, CornerDownLeft, Search, TrendingUp, X } from "lucide-react";
+import {
+  Clock,
+  CornerDownLeft,
+  ImageOff,
+  Package,
+  Search,
+  SearchX,
+  TrendingUp,
+  X,
+} from "lucide-react";
 import { CATEGORY_META } from "@/config/catalog";
 import { formatPriceCompact } from "@/lib/format";
 import { cn } from "@/lib/cn";
@@ -89,11 +98,14 @@ export default function SearchSuggestions({
         {!isLoading && isSearching && rows.length <= 1 && (
           /* `<=1` because the trailing "search for X" row is always present —
              on its own it means we found nothing. */
-          <li className="px-3 py-10 text-center">
-            <p className="text-2xl" aria-hidden>
-              🔍
-            </p>
-            <p className="mt-2 text-body-sm font-medium text-ink">
+          <li className="flex flex-col items-center px-3 py-10 text-center">
+            <span
+              aria-hidden
+              className="grid h-9 w-9 place-items-center rounded-full bg-surface-2 text-muted"
+            >
+              <SearchX size={iconSize.md} strokeWidth={ICON_STROKE} />
+            </span>
+            <p className="mt-3 text-body-sm font-medium text-ink">
               Nothing matching “{query}”
             </p>
             <p className="mt-1 text-caption text-muted">
@@ -240,16 +252,18 @@ function Leading({ row }: { row: SuggestionRow }) {
         className="h-10 w-10 shrink-0 rounded-sm object-cover"
       />
     ) : (
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-sm bg-surface-2 text-body">
-        📦
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-sm bg-surface-2 text-faint">
+        <ImageOff size={iconSize.md} strokeWidth={ICON_STROKE} />
       </span>
     );
   }
 
   if (row.kind === "category") {
+    const CategoryIcon =
+      row.Icon ?? CATEGORY_META[row.label as keyof typeof CATEGORY_META]?.Icon ?? Package;
     return (
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-sm bg-surface-2 text-body">
-        {row.emoji ?? CATEGORY_META[row.label as keyof typeof CATEGORY_META]?.emoji ?? "📦"}
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-sm bg-surface-2 text-muted">
+        <CategoryIcon size={iconSize.md} strokeWidth={ICON_STROKE} />
       </span>
     );
   }

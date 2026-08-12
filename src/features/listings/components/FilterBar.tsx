@@ -74,18 +74,21 @@ export default function FilterBar({
         <Chip active={!filters.category} onClick={() => onChange({ category: "" })}>
           All
         </Chip>
-        {LISTING_CATEGORIES.map((category) => (
-          <Chip
-            key={category}
-            active={filters.category === category}
-            icon={<span aria-hidden>{CATEGORY_META[category].emoji}</span>}
-            onClick={() =>
-              onChange({ category: filters.category === category ? "" : category })
-            }
-          >
-            {category}
-          </Chip>
-        ))}
+        {LISTING_CATEGORIES.map((category) => {
+          const { Icon } = CATEGORY_META[category];
+          return (
+            <Chip
+              key={category}
+              active={filters.category === category}
+              icon={<Icon size={iconSize.xs} strokeWidth={ICON_STROKE} aria-hidden />}
+              onClick={() =>
+                onChange({ category: filters.category === category ? "" : category })
+              }
+            >
+              {category}
+            </Chip>
+          );
+        })}
       </div>
 
       <div className="flex items-center gap-3">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { LucideIcon } from "lucide-react";
 import { TRENDING_SEARCHES } from "@/config/site";
 
 const RECENT_KEY = "unisale.recentSearches";
@@ -91,7 +92,8 @@ export interface SuggestionRow {
   meta?: string;
   price?: number;
   image?: string;
-  emoji?: string;
+  /** Category rows carry their Lucide icon through from `CATEGORY_META`. */
+  Icon?: LucideIcon;
 }
 
 /**

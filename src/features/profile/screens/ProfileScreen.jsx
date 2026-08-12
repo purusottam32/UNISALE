@@ -17,6 +17,8 @@ import { usePendingReviews, useUserReviews } from "../hooks";
 import PendingReviewPrompt from "../components/PendingReviewPrompt";
 import ReviewList from "../components/ReviewList";
 import TrustMeter from "../components/TrustMeter";
+import { Handshake, PauseCircle, ShoppingBag } from "lucide-react";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 
 /**
  * Your own profile — part storefront, part dashboard.
@@ -127,7 +129,15 @@ export default function ProfileScreen() {
           isLoading={isLoading}
           emptyState={
             <EmptyState
-              glyph={tab === "sold" ? "🤝" : tab === "paused" ? "⏸️" : "🛍️"}
+              icon={
+                tab === "sold" ? (
+                  <Handshake size={iconSize.xl} strokeWidth={ICON_STROKE} />
+                ) : tab === "paused" ? (
+                  <PauseCircle size={iconSize.xl} strokeWidth={ICON_STROKE} />
+                ) : (
+                  <ShoppingBag size={iconSize.xl} strokeWidth={ICON_STROKE} />
+                )
+              }
               title={
                 tab === "sold"
                   ? "No completed deals yet"

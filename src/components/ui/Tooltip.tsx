@@ -35,14 +35,18 @@ export default function Tooltip({
           align={align}
           sideOffset={6}
           className={cn(
-            "z-[70] max-w-[16rem] rounded-xs bg-ink px-2.5 py-1.5 text-caption font-medium text-inverse shadow-e3",
+            /* Top of the surface ladder, not `bg-ink`. An inverted tooltip is
+               a light-mode idiom: in dark it becomes a near-white card firing
+               on every icon hover, which is the brightest thing on screen and
+               attached to the least important information on it. */
+            "z-[70] max-w-[16rem] rounded-xs bg-surface-3 px-2.5 py-1.5 text-caption font-medium text-ink shadow-e3",
             /* Grows from the trigger edge — Radix supplies the origin. */
             "origin-[var(--radix-tooltip-content-transform-origin)]",
             "data-[state=delayed-open]:animate-pop-in data-[state=closed]:animate-pop-out"
           )}
         >
           {content}
-          <TooltipPrimitive.Arrow className="fill-ink" width={10} height={5} />
+          <TooltipPrimitive.Arrow className="fill-surface-3" width={10} height={5} />
         </TooltipPrimitive.Content>
       </TooltipPrimitive.Portal>
     </TooltipPrimitive.Root>

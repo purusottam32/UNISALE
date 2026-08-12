@@ -18,19 +18,21 @@ export default function SellerCard({ seller, responsiveness, compact = false }) 
   const id = seller._id || seller.id;
 
   return (
-    <div className="rounded-lg border border-line bg-surface p-4">
+    <div className="rounded-lg bg-surface p-4 shadow-e1">
       <Link href={`/u/${id}`} className="flex items-center gap-3 group">
         <Avatar src={seller.avatar?.url || seller.avatar} name={seller.name} size="lg" />
 
         <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold text-ink group-hover:text-brand">{seller.name}</p>
-          <p className="truncate text-xs text-muted">{formatCampusLine(seller)}</p>
+          <p className="truncate text-subtitle text-ink transition-colors duration-[--duration-fast] group-hover:text-brand">
+            {seller.name}
+          </p>
+          <p className="truncate text-caption text-muted">{formatCampusLine(seller)}</p>
 
           <div className="mt-1.5 flex flex-wrap items-center gap-2">
             {seller.ratingCount > 0 ? (
               <RatingStars value={seller.ratingAverage} count={seller.ratingCount} />
             ) : (
-              <span className="text-xs text-muted">No ratings yet</span>
+              <span className="text-caption text-muted">No ratings yet</span>
             )}
           </div>
         </div>
@@ -40,11 +42,14 @@ export default function SellerCard({ seller, responsiveness, compact = false }) 
         </span>
       </Link>
 
+      {/* The rule below separates two groups inside one card, which is what
+          `--color-line` is for — unlike the outline this card used to carry,
+          which is now `shadow-e1`. */}
       {!compact && (
-        <div className="mt-3.5 flex flex-wrap items-center gap-2 border-t border-line pt-3.5">
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-3.5">
           <TrustBadge tier={seller.trustTier} isEmailVerified={seller.isEmailVerified} />
           {seller.createdAt && (
-            <span className="text-xs text-muted">
+            <span className="text-caption text-muted">
               Member since {formatMemberSince(seller.createdAt)}
             </span>
           )}
@@ -52,7 +57,7 @@ export default function SellerCard({ seller, responsiveness, compact = false }) 
       )}
 
       {responsiveness?.label && (
-        <p className="mt-2 text-xs font-medium text-success">{responsiveness.label}</p>
+        <p className="mt-2 text-caption font-medium text-success">{responsiveness.label}</p>
       )}
     </div>
   );

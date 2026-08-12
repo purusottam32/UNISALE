@@ -13,6 +13,7 @@ import {
 } from "@/config/catalog";
 import { useAuth } from "@/features/auth/auth-context";
 import { getErrorMessage } from "@/lib/errors";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 import Button from "@/components/ui/Button";
 import { ChoiceGroup, Input, Textarea } from "@/components/ui/Field";
 import Chip from "@/components/ui/Chip";
@@ -169,16 +170,19 @@ export default function EditListingScreen({ listingId }) {
       <div>
         <p className="mb-2 text-[13px] font-medium text-ink-2">Category</p>
         <div className="flex flex-wrap gap-2">
-          {LISTING_CATEGORIES.map((category) => (
-            <Chip
-              key={category}
-              active={form.category === category}
-              onClick={() => set({ category })}
-            >
-              <span aria-hidden>{CATEGORY_META[category]?.emoji}</span>
-              {category}
-            </Chip>
-          ))}
+          {LISTING_CATEGORIES.map((category) => {
+            const CategoryIcon = CATEGORY_META[category].Icon;
+            return (
+              <Chip
+                key={category}
+                active={form.category === category}
+                icon={<CategoryIcon size={iconSize.xs} strokeWidth={ICON_STROKE} aria-hidden />}
+                onClick={() => set({ category })}
+              >
+                {category}
+              </Chip>
+            );
+          })}
         </div>
       </div>
 

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart, MapPin, ShieldCheck, Star } from "lucide-react";
+import { Heart, ImageOff, MapPin, ShieldCheck, Star } from "lucide-react";
 import { formatCondition } from "@/config/catalog";
 import { useAuth } from "@/features/auth/auth-context";
 import { formatPrice, formatRelativeTime, getDiscountPercent } from "@/lib/format";
@@ -147,8 +147,8 @@ export default function ProductCard({
             )}
           />
         ) : (
-          <div className="grid h-full place-items-center text-3xl text-muted" aria-hidden>
-            📦
+          <div className="grid h-full place-items-center text-faint" aria-hidden>
+            <ImageOff size={iconSize["2xl"]} strokeWidth={ICON_STROKE} />
           </div>
         )}
 
@@ -214,7 +214,11 @@ export default function ProductCard({
               <span className="text-caption tabular text-muted line-through">
                 {formatPrice(listing.originalPrice!)}
               </span>
-              <span className="text-caption font-semibold text-accent">−{discount}%</span>
+              {/* Not `text-accent`. Emerald is the loudest colour available on
+                  a near-black canvas and it means one thing — verified. A
+                  discount is not a trust signal, and putting it in green made
+                  it shout over the price directly above it. */}
+              <span className="text-caption font-medium text-ink-2">−{discount}%</span>
             </>
           )}
         </div>

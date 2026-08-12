@@ -201,7 +201,10 @@ function IconAction({
 
   const badge = count > 0 && (
     <span
-      className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-danger-fill px-1 text-[0.5625rem] tabular font-bold leading-none text-white"
+      /* `text-white` is literal on purpose: `danger-fill` is the same colour in
+         both themes (4.71:1 against white), so routing this through a token
+         that flips would make it worse, not more consistent. */
+      className="absolute right-0.5 top-0.5 grid h-[17px] min-w-[17px] place-items-center rounded-full bg-danger-fill px-1 text-nano tabular text-white"
       aria-hidden
     >
       {count > 9 ? "9+" : count}

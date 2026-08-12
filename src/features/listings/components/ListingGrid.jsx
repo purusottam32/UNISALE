@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useSaveToggle } from "@/features/saved/hooks";
 import Button from "@/components/ui/Button";
 import { ProductGridSkeleton } from "@/components/ui/Skeleton";
+import { ErrorState } from "@/components/ui/States";
 import ProductCard from "./ProductCard";
 
 /**
@@ -24,6 +25,14 @@ export default function ListingGrid({
   onLoadMore,
   isFetchingMore,
   emptyState,
+  /**
+   * Error message from the query, if any. Without this the grid could only
+   * distinguish "loading" from "no results", so an API outage rendered
+   * "your campus has nothing yet" — telling every user on a broken deploy that
+   * the marketplace is empty, which is both wrong and unrecoverable from.
+   */
+  error,
+  onRetry,
   skeletonCount = 8,
 }) {
   const { isSaved, toggle, isPending } = useSaveToggle();
@@ -47,6 +56,17 @@ export default function ListingGrid({
   }, [hasMore, onLoadMore, isFetchingMore]);
 
   if (isLoading) return <ProductGridSkeleton count={skeletonCount} />;
+
+  /* Error before empty: an outage is not an empty campus. */
+  if (error && (!listings || listings.length === 0)) {
+    return (
+      <ErrorState
+        description={error}
+        onRetry={onRetry}
+        offline={typeof navigator !== "undefined" && navigator.onLine === false}
+      />
+    );
+  }
 
   if (!listings || listings.length === 0) return emptyState || null;
 

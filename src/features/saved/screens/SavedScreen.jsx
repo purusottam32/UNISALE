@@ -4,6 +4,8 @@ import { EmptyState } from "@/components/ui/States";
 import { ProductGridSkeleton } from "@/components/ui/Skeleton";
 import ListingGrid from "@/features/listings/components/ListingGrid";
 import { useSavedListings } from "../hooks";
+import { Heart } from "lucide-react";
+import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
 
 export default function SavedScreen() {
   const { listings, isLoading } = useSavedListings();
@@ -26,7 +28,7 @@ export default function SavedScreen() {
         listings={active}
         emptyState={
           <EmptyState
-            glyph="🤍"
+            icon={<Heart size={iconSize.xl} strokeWidth={ICON_STROKE} />}
             title="Nothing saved yet"
             description="Tap the heart on any listing to keep it here and get notified when its price drops."
             action={{ label: "Start browsing", href: "/explore" }}
