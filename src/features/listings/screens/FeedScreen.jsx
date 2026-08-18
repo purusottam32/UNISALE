@@ -99,7 +99,10 @@ export default function FeedScreen() {
             </Link>
           </div>
 
-          <div className="rail -mx-4 px-4 md:mx-0 md:px-0">
+          {/* `gap-3` is not optional: `rail` sets `display:flex` but declares no
+              gap, so without it the 168px cards butt edge to edge and two
+              listings read as one. */}
+          <div className="rail -mx-4 gap-3 px-4 md:mx-0 md:px-0">
             {trendingLoading
               ? /* The composed skeleton, not a bare block: it mirrors the card's
                    photo plus three text rows, so nothing shifts on arrival. */

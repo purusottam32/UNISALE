@@ -230,7 +230,8 @@ export default function ListingDetailScreen({ listingId, initialData }) {
       {similar.length > 0 && (
         <section>
           <h2 className="mb-4 text-title text-ink">More like this</h2>
-          <div className="rail -mx-4 px-4 md:mx-0 md:px-0">
+          {/* See FeedScreen: `rail` carries no gap of its own. */}
+          <div className="rail -mx-4 gap-3 px-4 md:mx-0 md:px-0">
             {similar.map((item) => (
               <div key={item._id} className="w-[168px]">
                 <ProductCard
@@ -282,7 +283,12 @@ export default function ListingDetailScreen({ listingId, initialData }) {
   );
 }
 
-function DetailSkeleton() {
+/**
+ * Exported so the route's `loading.tsx` renders the same geometry the client
+ * query falls back to. Two hand-written copies of this layout would drift, and
+ * a skeleton that doesn't match what replaces it is worse than none.
+ */
+export function DetailSkeleton() {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
       <div className="space-y-4">

@@ -9,6 +9,7 @@ import { useAuth } from "@/features/auth/auth-context";
 import { useTrendingListings } from "@/features/listings/hooks";
 import ProductCard from "@/features/listings/components/ProductCard";
 import Footer from "@/components/layout/Footer";
+import SkipLink from "@/components/layout/SkipLink";
 import Button from "@/components/ui/Button";
 import { ProductCardSkeleton } from "@/components/ui/Skeleton";
 import { ICON_STROKE, iconSize } from "@/lib/design-tokens";
@@ -99,12 +100,16 @@ export default function LandingScreen() {
 
   return (
     <div className="min-h-screen bg-canvas">
+      <SkipLink />
       <LandingHeader />
 
       {/* A real `main` landmark. Without it the page was header / footer / two
           navs and five unnamed sections, so a screen-reader user had no
-          "skip to content" target and no way to jump past the chrome. */}
-      <main id="main">
+          "skip to content" target and no way to jump past the chrome.
+          `tabIndex={-1}` is what makes the skip link actually move focus —
+          without it the hash scrolls the page but leaves focus in the header,
+          so the next Tab lands back on the nav the user just skipped. */}
+      <main id="main" tabIndex={-1} className="outline-none">
       {/* ══ Hero ════════════════════════════════════════════════════════════ */}
       <section className="container-page pb-16 pt-20 md:pb-24 md:pt-28">
         {/* `items-start`, NOT `items-end`. The proof column is a 2×2 grid of 4:5

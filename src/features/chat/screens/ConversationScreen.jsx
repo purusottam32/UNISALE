@@ -249,8 +249,10 @@ export default function ConversationScreen({ conversationId }) {
 
       <form
         onSubmit={submit}
-        className="sticky bottom-0 border-t border-line bg-surface/96 backdrop-blur-md"
-        style={{ paddingBottom: "calc(var(--tabbar-h) + env(safe-area-inset-bottom))" }}
+        /* The bottom padding clears the mobile tab bar the composer would
+           otherwise sit under. The tab bar is `lg:hidden`, so on desktop that
+           same padding was 62px of dead surface below the input. */
+        className="sticky bottom-0 border-t border-line bg-surface/96 pb-[calc(var(--tabbar-h)+env(safe-area-inset-bottom))] backdrop-blur-md lg:pb-0"
       >
         <div className="mx-auto flex w-full max-w-3xl items-end gap-2 px-4 py-3">
           <textarea

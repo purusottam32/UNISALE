@@ -86,7 +86,7 @@ export default function ListingGallery({ images = [], title = "" }) {
       </div>
 
       {count > 1 && (
-        <div className="rail">
+        <div className="rail gap-2">
           {images.map((image, position) => (
             <button
               key={image.url}

@@ -56,6 +56,9 @@ __pycache__/
 .claude/
 CLAUDE.local.md
 
+# Playwright MCP session artifacts (snapshots, console logs, screenshots)
+.playwright-mcp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
